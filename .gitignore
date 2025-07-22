@@ -18,6 +18,10 @@
 !/log/.keep
 !/tmp/.keep
 
+# Ignore CSV files in tmp directory but keep sample files
+/tmp/*.csv
+!/tmp/sample_*.csv
+
 # Ignore pidfiles, but keep the directory.
 /tmp/pids/*
 !/tmp/pids/
