@@ -30,6 +30,10 @@ docker compose -f docker-compose.dev.yml up -d
 docker compose -f docker-compose.dev.yml exec app rails db:seed
 ```
 
+```shell
+docker compose -f docker-compose.dev.yml exec app bin/dev
+```
+
 - The application is now available at `http://localhost:3000`!
 
 - To stop the development environment:

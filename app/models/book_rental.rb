@@ -88,7 +88,7 @@ class BookRental < ApplicationRecord
   private
 
   def book_is_available
-    errors.add(:base, I18n.t('book_not_available')) unless book.available?
+    errors.add(:base, I18n.t('book_not_available')) unless book&.available?
   end
 
   def member_has_only_max_rentals

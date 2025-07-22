@@ -38,10 +38,6 @@ COPY --link .yarnrc package.json yarn.lock ./
 COPY --link .yarn/releases/* .yarn/releases/
 RUN yarn install --frozen-lockfile
 
-RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp /bundle
-
-USER rails
 #
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
