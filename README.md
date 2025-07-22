@@ -7,61 +7,50 @@ Library app written in Rails
 - [Ruby on Rails (6.1.4)](https://guides.rubyonrails.org/v6.1.4/) 
 - [Stimulus](https://stimulus.hotwired.dev/handbook/introduction)
 - [PostgreSQL](https://www.postgresql.org/docs/14/index.html)
-- [Heroku](https://devcenter.heroku.com/articles/getting-started-with-rails6)
+- [Docker](https://docs.docker.com/get-started/)
+- [Fly.io](https://fly.io/docs/)
 
 ## Usage
 
-- Install [rvm](https://rvm.io) and configure it.
+- Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) for your platform
+
+- Build and start the development environment using Docker Compose
 ```shell
-rvm 3.2.2
-rvm gemset create LibraryApp
-rvm 3.2.2@LibraryApp
+docker compose -f docker-compose.dev.yml up -d
 ```
 
-```shell
-npm install webpack-dev-server -g
-```
+- The application will automatically:
+  - Set up PostgreSQL 14 database
+  - Install Ruby gems and JavaScript dependencies
+  - Create and migrate the database
+  - Start the Rails development server
 
-- Install bundler
+- (Optional) Seed database using values from `db/seeds`. Run this in a separate terminal:
 ```shell
-gem install bundler
-bundle install
-```
-
-- Install and configure [PostgreSQL 14](https://www.postgresql.org/download/) for your platform
-
-- Create database and run migrations
-```shell
-rails db:create
-rails db:migrate
-```
-
-- (Optional) Seed database using values from `db/seeds`
-```shell
-rails db:seed
-```
-
-- Run development processes
-```shell
-./bin/dev
+docker compose -f docker-compose.dev.yml exec app rails db:seed
 ```
 
 - The application is now available at `http://localhost:3000`!
 
+- To stop the development environment:
+```shell
+docker compose -f docker-compose.dev.yml down
+```
+
 ## Deployment
 
-- Deployment uses heroku hobby dyno.
-- Make sure you're logged in via the `heroku-cli`
+- Deployment uses [Fly.io](https://fly.io/) platform.
+- Make sure you have the [Fly CLI](https://fly.io/docs/hands-on/install-flyctl/) installed and are logged in:
 ```shell
-heroku login
+fly auth login
 ```
-- Run migrations
+- Run migrations on the deployed application:
 ```shell
-heroku run rails db:migrate
+fly ssh console -a muthamizh-mandram -C "rails db:migrate"
 ```
-- Push code to the `heroku` remote to deploy
+- Deploy the application to Fly.io:
 ```shell
-git push heroku master
+fly deploy
 ```
 
 ## Roadmap
