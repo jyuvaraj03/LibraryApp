@@ -5,18 +5,22 @@ five_point_someone:
   publishing_year: 2004
   author: bhagat
   publisher: rupa
+  custom_number: B00001
 
 oliver_twist:
   name: Oliver Twist
   publishing_year: 1838
   author: dickens
   publisher: bentley
+  custom_number: B00002
 
 bleak_house:
   name: Bleak House
   author: dickens
+  custom_number: B00003
 
 # unborrowed
 unborrowed:
   name: Hard Times
   author: dickens
+  custom_number: B00004

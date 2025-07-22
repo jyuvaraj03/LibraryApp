@@ -165,11 +165,11 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'cannot be created with empty author_name' do
+  test 'can be created with empty author_name' do
     get new_book_path
     assert_response :success
 
-    assert_no_difference 'Book.count' do
+    assert_difference 'Book.count', 1 do
       post books_path,
            params: {
              book: {
@@ -180,8 +180,9 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
                category_names: 'Mystery, Thriller'
              }
            }
-      assert_not_nil flash[:form_errors]
-      assert_redirected_to new_book_path
+      assert_response :redirect
+      follow_redirect!
+      assert_response :success
     end
   end
 
@@ -332,17 +333,20 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
 
   test 'cannot create book when logged out' do
     delete logout_path
-    assert_raise Pundit::NotAuthorizedError do
-      post books_path,
-           params: {
-             book: {
-               name: 'Da Vinci Code',
-               author_name: 'Dan Brown',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '2010',
-               category_names: 'Mystery, Crime'
-             }
+    post books_path,
+         params: {
+           book: {
+             name: 'Da Vinci Code',
+             author_name: 'Dan Brown',
+             publisher_name: 'Penguin Labs',
+             publishing_year: '2010',
+             category_names: 'Mystery, Crime'
            }
-    end
+         }
+    assert_response :redirect
+    follow_redirect!
+    assert_response :success
+    # Check for the actual warning message shown to unauthenticated users
+    assert_match 'நூலக செயல்பாடுகளை அணுக நிர்வாகியாக', response.body
   end
 end

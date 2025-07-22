@@ -7,15 +7,15 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should not be able to access new book page when not logged in' do
-    assert_raises Pundit::NotAuthorizedError do
-      get new_book_path
-    end
+    get new_book_path
+    assert_redirected_to root_path
+    assert_equal I18n.t('not_authorized'), flash[:danger]
   end
 
   test 'should not be able to create new book when not logged in' do
-    assert_raises Pundit::NotAuthorizedError do
-      post books_path
-    end
+    post books_path
+    assert_redirected_to root_path
+    assert_equal I18n.t('not_authorized'), flash[:danger]
   end
 
   test 'should be able to access index page when not logged in' do

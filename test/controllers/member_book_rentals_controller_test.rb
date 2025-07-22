@@ -2,7 +2,7 @@ require "test_helper"
 
 class MemberBookRentalsControllerTest < ActionDispatch::IntegrationTest
   test "should contain the member's current book rentals" do
-    member = members(:johnny)
+    member = members(:phineas)
     book = books(:unborrowed)
     new_book_rental = member.book_rentals.create(book: book, issued_on: Date.today)
     assert new_book_rental.valid?
@@ -16,7 +16,7 @@ class MemberBookRentalsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not contain the member's returned book rentals" do
-    member = members(:johnny)
+    member = members(:phineas)
     book = books(:unborrowed)
     new_book_rental = member.book_rentals.create(book: book, issued_on: 2.days.ago, returned_on: Date.today)
     assert new_book_rental.valid?

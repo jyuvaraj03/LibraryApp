@@ -20,6 +20,8 @@ class BookRental < ApplicationRecord
   belongs_to :book
   belongs_to :member
 
+  before_validation :set_default_issued_on, on: :create
+
   validate :book_is_available, :member_has_only_max_rentals, on: :create
 
   scope :current, -> { where(returned_on: nil) }
@@ -87,8 +89,13 @@ class BookRental < ApplicationRecord
 
   private
 
+  def set_default_issued_on
+    self.issued_on ||= Date.today
+  end
+
   def book_is_available
-    errors.add(:base, I18n.t('book_not_available')) unless book&.available?
+    return false if book.nil?
+    errors.add(:base, I18n.t('book_not_available')) unless book.available?
   end
 
   def member_has_only_max_rentals

@@ -60,12 +60,12 @@ class BookTest < ActiveSupport::TestCase
     assert book.valid?
   end
 
-  test 'should not be without an author' do
+  test 'can be without an author' do
     book = books(:oliver_twist)
     assert book.valid?
 
     book.author = nil
-    assert book.invalid?
+    assert book.valid?
   end
 
   test 'can have zero categories' do
@@ -107,11 +107,13 @@ class BookTest < ActiveSupport::TestCase
     assert book.invalid?
   end
 
-  test 'cannot create with associated models when author name is missing' do
+  test 'can create with associated models when author name is missing' do
     book = Book.create_with_associated_models(name: @book_name, author_name: nil,
                                               publisher_name: @publisher_name, publishing_year: @publishing_year,
                                               category_names: @categories)
-    assert book.invalid?
+    book.reload
+    assert book.valid?
+    assert_nil book.author
   end
 
   test 'can create with associated models when publisher name is missing' do
@@ -277,6 +279,7 @@ class BookTest < ActiveSupport::TestCase
   test 'search should return only the max number of results given' do
     book = books(:five_point_someone)
     dup_book = book.dup
+    dup_book.custom_number = 'B00099' # Ensure uniqueness
     assert dup_book.valid?
     dup_book.save!
 

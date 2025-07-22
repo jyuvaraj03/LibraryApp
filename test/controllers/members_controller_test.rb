@@ -2,21 +2,21 @@ require "test_helper"
 
 class MembersControllerTest < ActionDispatch::IntegrationTest
   test 'should not be able to get index when not logged in' do
-    assert_raises Pundit::NotAuthorizedError do
-      get members_path
-    end
+    get members_path
+    assert_redirected_to root_path
+    assert_equal I18n.t('not_authorized'), flash[:danger]
   end
 
   test 'should not be able to get new page when not logged in' do
-    assert_raises Pundit::NotAuthorizedError do
-      get new_member_path
-    end
+    get new_member_path
+    assert_redirected_to root_path
+    assert_equal I18n.t('not_authorized'), flash[:danger]
   end
 
   test 'should not be able to create new member when not logged in' do
-    assert_raises Pundit::NotAuthorizedError do
-      post members_path
-    end
+    post members_path
+    assert_redirected_to root_path
+    assert_equal I18n.t('not_authorized'), flash[:danger]
   end
 
   test 'should be able to get index when logged in' do

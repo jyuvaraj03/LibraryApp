@@ -21,5 +21,5 @@ returned_will_borrow_again:
 returned_and_borrowed_again:
   book: bleak_house
   member: johnny
-  issued_on: <% 1.day.ago %>
+  issued_on: <%= 1.day.ago %>
   returned_on: nil

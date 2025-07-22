@@ -76,13 +76,24 @@ class Book < ApplicationRecord
       publisher = Publisher.find_or_create_by(name: hash[:publisher_name])
       categories = hash[:category_names]&.split(',')&.map do |category_name|
         Category.find_or_create_by(name: category_name.strip)
-      end || []
-      @new_book = Book.create(custom_number: hash[:custom_number], name: hash[:name], author: author, publisher: publisher,
+      end&.compact || []
+
+      # Auto-generate a unique custom_number if not provided
+      custom_number = hash[:custom_number].presence || generate_unique_custom_number
+
+      @new_book = Book.create(custom_number: custom_number, name: hash[:name], author: author, publisher: publisher,
                               publishing_year: hash[:publishing_year], categories: categories)
       raise ActiveRecord::Rollback if @new_book.invalid?
-
     end
     @new_book
+  end
+
+  # Generates a unique custom_number for a new book
+  def self.generate_unique_custom_number
+    loop do
+      number = "B#{SecureRandom.hex(6)}"
+      break number unless Book.exists?(custom_number: number)
+    end
   end
 
   def available?

@@ -27,15 +27,15 @@ class ReturnsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should not be able to get new page when logged out' do
     delete logout_path
-    assert_raises Pundit::NotAuthorizedError do
-      get new_return_path
-    end
+    get new_return_path
+    assert_redirected_to root_path
+    assert_equal I18n.t('not_authorized'), flash[:danger]
   end
 
   test 'should not be able to create new return when logged out' do
     delete logout_path
-    assert_raises Pundit::NotAuthorizedError do
-      post returns_path
-    end
+    post returns_path
+    assert_redirected_to root_path
+    assert_equal I18n.t('not_authorized'), flash[:danger]
   end
 end
