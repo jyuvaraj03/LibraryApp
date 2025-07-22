@@ -45,7 +45,7 @@ docker compose -f docker-compose.dev.yml down
 
 The application includes functionality to import and export books and members as CSV files.
 
-### Using Rake Tasks
+### Rake Tasks
 
 ```shell
 # Export books to CSV
@@ -59,24 +59,6 @@ rails csv:import_books FILENAME=books.csv
 
 # Import members from CSV
 rails csv:import_members FILENAME=members.csv
-```
-
-### Using CLI Script
-
-For environments where Rails is not available, use the standalone CLI script:
-
-```shell
-# Export books
-ruby script/csv_cli.rb export books
-
-# Export members
-ruby script/csv_cli.rb export members
-
-# Import books
-ruby script/csv_cli.rb import books books.csv
-
-# Import members
-ruby script/csv_cli.rb import members members.csv
 ```
 
 For detailed usage instructions, see [CSV Import/Export Documentation](doc/CSV_IMPORT_EXPORT.md).
