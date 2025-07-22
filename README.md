@@ -14,15 +14,9 @@ Library app written in Rails
 
 - Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) for your platform
 
-- Clone the repository and navigate to the project directory
-```shell
-git clone <repository-url>
-cd LibraryApp
-```
-
 - Build and start the development environment using Docker Compose
 ```shell
-docker compose -f docker-compose.dev.yml up --build
+docker compose -f docker-compose.dev.yml up -d
 ```
 
 - The application will automatically:
