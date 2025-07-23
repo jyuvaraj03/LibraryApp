@@ -91,9 +91,9 @@ class MemberTest < ActiveSupport::TestCase
     assert_includes Member.search(member.name), member
   end
 
-  test 'search by id should match member by id' do
+  test 'search by id should match member by custom number' do
     member = members(:johnny)
-    assert_includes Member.search(member.id), member
+    assert_includes Member.search(member.custom_number), member
   end
 
   test 'search by id should match member by personal number' do

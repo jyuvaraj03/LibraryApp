@@ -98,4 +98,18 @@ class BookRentalTest < ActiveSupport::TestCase
     filter_results = BookRental.filter_by_show_all('')
     assert_equal BookRental.current, filter_results
   end
+
+  test 'search_by_id should find by book custom_number' do
+    book_rental = book_rentals(:returned)
+    custom_number = book_rental.book.custom_number
+    results = BookRental.search_by_id(custom_number)
+    assert_includes results, book_rental
+  end
+
+  test 'search_by_id should find by member custom_number' do
+    book_rental = book_rentals(:returned)
+    custom_number = book_rental.member.custom_number
+    results = BookRental.search_by_id(custom_number)
+    assert_includes results, book_rental
+  end
 end

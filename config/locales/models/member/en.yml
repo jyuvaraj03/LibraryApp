@@ -4,7 +4,7 @@ en:
       member: "Member"
     attributes:
       member:
-        id: "Member ID"
+        id: "Member (DB) ID"
         name: "Name"
         tamil_name: "Name in Tamil"
         section: "Section"
@@ -13,3 +13,4 @@ en:
         date_of_retirement: "Date of Retirement"
         email: "Email"
         phone: "Phone"
+        custom_number: "Member ID"

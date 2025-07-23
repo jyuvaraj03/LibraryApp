@@ -14,6 +14,9 @@ class Book < ApplicationRecord
   include PgSearch::Model
   include Filterable
 
+  include Searchable
+  SEARCH_SCOPES = %i[search_by_custom_number search_by_name]
+
   belongs_to :author, optional: true
   belongs_to :publisher, optional: true
   has_many :book_categories
@@ -27,6 +30,11 @@ class Book < ApplicationRecord
   # validates :custom_number, presence: true
   validates :name, presence: true
   validates :publishing_year, numericality: { allow_nil: true, less_than_or_equal_to: Time.now.year }
+  include CustomNumberAssignable
+
+  def self.custom_number_column; :custom_number; end
+  def self.custom_number_prefix; 'B'; end
+  def self.custom_number_length; 6; end
 
   pg_search_scope :search_by_name,
                   against: %i[name],
@@ -61,14 +69,6 @@ class Book < ApplicationRecord
     where(custom_number:)
   end
 
-  def self.search(query, max_results=nil)
-    # TODO: Optimize this when you know the custom number pattern
-    if query.present?
-      where(id: search_by_custom_number(query).pluck(:id) + search_by_name(query).pluck(:id)).limit(max_results)
-    else
-      all.limit(max_results)
-    end
-  end
 
   def self.create_with_associated_models(hash = {})
     Book.transaction do
@@ -78,22 +78,12 @@ class Book < ApplicationRecord
         Category.find_or_create_by(name: category_name.strip)
       end&.compact || []
 
-      # Auto-generate a unique custom_number if not provided
-      custom_number = hash[:custom_number].presence || generate_unique_custom_number
 
-      @new_book = Book.create(custom_number: custom_number, name: hash[:name], author: author, publisher: publisher,
+      @new_book = Book.create(custom_number: hash[:custom_number], name: hash[:name], author: author, publisher: publisher,
                               publishing_year: hash[:publishing_year], categories: categories)
       raise ActiveRecord::Rollback if @new_book.invalid?
     end
     @new_book
-  end
-
-  # Generates a unique custom_number for a new book
-  def self.generate_unique_custom_number
-    loop do
-      number = "B#{SecureRandom.hex(6)}"
-      break number unless Book.exists?(custom_number: number)
-    end
   end
 
   def available?

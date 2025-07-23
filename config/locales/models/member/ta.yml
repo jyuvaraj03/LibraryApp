@@ -4,7 +4,7 @@ ta:
       member: "உறுப்பினர்"
     attributes:
       member:
-        id: "உறுப்பினர் எண்"
+        id: "உறுப்பினர் (DB) எண்"
         name: "பெயர் (ஆங்கிலத்தில்)"
         tamil_name: "பெயர்"
         section: "பிரிவு"
@@ -13,3 +13,4 @@ ta:
         date_of_retirement: "பணி ஓய்வு தேதி"
         email: "மின்னஞ்சல்"
         phone: "தொலைபேசி"
+        custom_number: "உறுப்பினர் எண்"
