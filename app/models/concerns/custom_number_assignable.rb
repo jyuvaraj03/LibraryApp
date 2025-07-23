@@ -6,9 +6,10 @@ module CustomNumberAssignable
   end
 
   module ClassMethods
+    # TODO: This method should generate an auto-incrementing custom number
     def generate_unique_custom_number(prefix = 'C', length = 6, column = :custom_number)
       loop do
-        number = "#{prefix}#{SecureRandom.hex(length)}"
+        number = "#{prefix}#{SecureRandom.hex(length / 2)}"
         break number unless self.exists?(column => number)
       end
     end

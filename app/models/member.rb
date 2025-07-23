@@ -34,7 +34,7 @@ class Member < ApplicationRecord
   validates :phone, length: { is: 10 }, uniqueness: true, allow_blank: true
 
   pg_search_scope :search_by_name,
-                  against: %i[name],
+                  against: %i[name tamil_name],
                   using: {
                     tsearch: { prefix: true }
                   }

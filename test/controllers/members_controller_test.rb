@@ -38,8 +38,18 @@ class MembersControllerTest < ActionDispatch::IntegrationTest
   test 'should be able to create new member when logged in' do
     log_in_as staffs(:admino)
     assert_nothing_raised do
-      post members_path, params: { member: { name: 'New Member', personal_number: 1234 } }
+      # Manual custom_number
+      post members_path, params: { member: { name: 'New Member', personal_number: 1234, custom_number: 'M999999' } }
       assert_response :redirect
+      member = Member.find_by(personal_number: 1234)
+      assert_equal 'M999999', member.custom_number
+
+      # Auto-assign custom_number
+      post members_path, params: { member: { name: 'Auto Member', personal_number: 1235, auto_assign_custom_number: true } }
+      assert_response :redirect
+      auto_member = Member.find_by(personal_number: 1235)
+      assert auto_member.custom_number.present?
+      assert_match /^M\S+$/, auto_member.custom_number
     end
   end
 

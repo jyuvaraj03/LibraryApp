@@ -6,6 +6,7 @@ ta:
   reset: "மீட்டமை"
   name: "பெயர்"
   create_member: "உறுப்பினரை உருவாக்கு"
+  member_custom_number_placeholder: "M000001"
   member_name_placeholder: "அப்துல் கலாம்"
   member_personal_id_placeholder: "8409"
   member_email_placeholder: "abdulkalam@example.com"
@@ -89,3 +90,5 @@ ta:
   member_borrowed_max_books: "உறுப்பினர் அதிகபட்ச புத்தகங்களை கடன் வாங்கியுள்ளார்"
   not_authorized: "நீங்கள் அங்கீகரிக்கப்படவில்லை. செயல்பாடுகளைத் தொடர உள்நுழையவும்."
   custom_number: "எண்"
+  member_custom_number_label: "உறுப்பினர் எண்"
+  auto_assign_custom_number: "எண்ணை தானாக வழங்கு"

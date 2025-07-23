@@ -6,6 +6,7 @@ en:
   reset: "Reset"
   name: "Name"
   create_member: "Create Member"
+  member_custom_number_placeholder: "M000001"
   member_name_placeholder: "Abdul Kalam"
   member_personal_id_placeholder: "8409"
   member_email_placeholder: "abdulkalam@example.com"
@@ -89,3 +90,4 @@ en:
   member_borrowed_max_books: "Member has already borrowed maximum number of books"
   not_authorized: "You are not authorized. Please log in to continue."
   custom_number: "Number"
+  auto_assign_custom_number: "Auto-assign number"

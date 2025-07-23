@@ -21,3 +21,6 @@ application.register("searchable-book-select", SearchableBookSelectController)
 
 import SearchableMemberSelectController from "./searchable_member_select_controller"
 application.register("searchable-member-select", SearchableMemberSelectController)
+
+import CustomNumberController from "./custom_number_controller"
+application.register("custom-number", CustomNumberController)
