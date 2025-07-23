@@ -1,0 +1,4 @@
+custom_number,name,publishing_year,author_name,publisher_name,category_names
+B001,The Ruby Way,2020,Ruby Author,Tech Publications,"Programming, Education"
+B002,Rails Guide,2021,Rails Master,Web Publishers,"Web Development, Framework"
+B003,Database Design,2019,DB Expert,Data Press,"Database, Design"
