@@ -3,30 +3,12 @@
     <%= form_with(model: @member, local: true, class: "flex flex-col w-full bg-white shadow-md border rounded-md p-12") do |f| %>
       <p class="text-4xl font-black mb-6"><%= t('create_member') %></p>
       <%= render 'shared/form_error_messages' %>
-      <div class="flex flex-col mb-6">
-        <%= f.label :name, t('name_label'), class: "block mb-2 font-medium required-field-label" %>
-        <%= f.text_field :name, required: true, placeholder: t('member_name_placeholder'), class: "shadow border px-4 py-2 w-full rounded" %>
-      </div>
-      <div class="flex flex-col mb-6">
-        <%= f.label :personal_number, t('personal_number_label'), class: "block mb-2 font-medium required-field-label" %>
-        <%= f.text_field :personal_number, required: true, placeholder: t('member_personal_id_placeholder'), class: "shadow border px-4 py-2 w-full rounded" %>
-      </div>
-      <div class="flex flex-col mb-6">
-        <%= f.label :phone, t('phone_number_label'), class: "block mb-2 font-medium" %>
-        <%= f.text_field :phone, placeholder: t('member_phone_placeholder'), class: "shadow border px-4 py-2 w-full rounded" %>
-      </div>
-      <div class="flex flex-col mb-6">
-        <%= f.label :email, t('email_label'), class: "block mb-2 font-medium" %>
-        <%= f.email_field :email, placeholder: t('member_email_placeholder'), class: "shadow border px-4 py-2 w-full rounded" %>
-      </div>
-      <div class="flex flex-col mb-6">
-        <%= f.label :date_of_birth, t('date_of_birth_label'), class: "block mb-2 font-medium" %>
-        <%= f.date_field :date_of_birth, max: Date.today, class: "shadow border px-4 py-2 w-full rounded" %>
-      </div>
-      <div class="flex flex-col mb-6">
-        <%= f.label :date_of_retirement, t('date_of_retirement_label'), class: "block mb-2 font-medium" %>
-        <%= f.date_field :date_of_retirement, min: Date.today, class: "shadow border px-4 py-2 w-full rounded" %>
-      </div>
+      <%= member_form_field(f, :name, :text_field, required: true, placeholder: t('member_name_placeholder')) %>
+      <%= member_form_field(f, :personal_number, :text_field, required: true, placeholder: t('member_personal_id_placeholder')) %>
+      <%= member_form_field(f, :phone, :text_field, label_text: t('phone_number_label'), placeholder: t('member_phone_placeholder')) %>
+      <%= member_form_field(f, :email, :email_field, placeholder: t('member_email_placeholder')) %>
+      <%= member_form_field(f, :date_of_birth, :date_field, max: Date.today) %>
+      <%= member_form_field(f, :date_of_retirement, :date_field, min: Date.today) %>
       <%= f.submit t('create'), class: "btn-primary" %>
     <% end %>
   </div>
