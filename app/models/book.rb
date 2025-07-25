@@ -15,7 +15,7 @@ class Book < ApplicationRecord
   include Filterable
 
   include Searchable
-  SEARCH_SCOPES = %i[search_by_custom_number search_by_name]
+  SEARCH_SCOPES = %i[search_by_id search_by_name]
 
   belongs_to :author, optional: true
   belongs_to :publisher, optional: true
@@ -65,8 +65,8 @@ class Book < ApplicationRecord
     end
   end
 
-  def self.search_by_custom_number(custom_number)
-    where(custom_number:)
+  def self.search_by_id(search_id)
+    where(custom_number: search_id).or(where(id: search_id))
   end
 
 

@@ -3,7 +3,13 @@
     <%= form_with(model: @book, local: true, class: "flex flex-col w-full bg-white shadow-md border rounded-md p-12") do |f| %>
       <p class="text-4xl font-black mb-4"><%= t('create_book') %></p>
       <%= render 'shared/form_error_messages' %>
-      <%= form_field(f, :custom_number, :text_field, required: true, label_text: t('custom_number'), placeholder: t('book_custom_number_placeholder')) %>
+      <div class="flex flex-col mb-6" data-controller="custom-number">
+        <%= form_field(f, :custom_number, :text_field, label_text: t('custom_number'), placeholder: t('book_custom_number_placeholder'), field_class: 'custom-number-input disabled:bg-gray-200 disabled:cursor-not-allowed', div_class: 'flex flex-col', data: { custom_number_target: 'input' }) %>
+        <label class="flex items-center gap-2">
+          <%= f.check_box :auto_assign_custom_number, { class: 'auto-assign-checkbox', checked: true, data: { action: 'custom-number#toggleInput', custom_number_target: 'checkbox' } }, true, false %>
+          <span><%= t('auto_assign_custom_number') %></span>
+        </label>
+      </div>
       <%= form_field(f, :name, :text_field, required: true, label_text: t('name_label'), placeholder: t('book_name_placeholder')) %>
       <%= form_field(f, :author_name, :text_field, required: true, label_text: t('author_name_label'), placeholder: t('book_author_placeholder')) %>
       <%= form_field(f, :publisher_name, :text_field, label_text: t('publisher_name_label'), placeholder: t('book_publisher_placeholder')) %>

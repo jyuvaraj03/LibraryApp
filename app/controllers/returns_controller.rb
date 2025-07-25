@@ -12,10 +12,10 @@ class ReturnsController < ApplicationController
       flash[:form_error] = I18n.t('book_rentals_not_found_for_given_member')
     else
       @book_rentals.update(returned_on: return_params[:returned_on])
-      flash[:snack_success] = I18n.t('successfully_returned_books_for_member', member_id: return_params[:member_id])
+      flash[:snack_success] = I18n.t('successfully_returned_books_for_member', member_custom_number: @book_rentals.first.member.custom_number)
     end
 
-    redirect_to new_return_path
+    redirect_to book_rentals_path
   end
 
   def return_params

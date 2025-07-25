@@ -43,7 +43,7 @@ class Member < ApplicationRecord
   scope :can_rent, -> { where( id: joins('LEFT JOIN book_rentals ON members.id = book_rentals.member_id AND book_rentals.returned_on IS NULL').group('members.id').having("COUNT(book_rentals.id) < #{BookRental::MAX_RENTALS} OR COUNT(book_rentals.id) IS NULL").merge(BookRental.current) ) }
 
   def self.search_by_id(search_id)
-    Member.where(custom_number: search_id).or(Member.where(personal_number: search_id))
+    Member.where(custom_number: search_id).or(Member.where(personal_number: search_id)).or(Member.where(id: search_id))
   end
 
   def self.filter_by_can_rent(filter_can_rent = false)

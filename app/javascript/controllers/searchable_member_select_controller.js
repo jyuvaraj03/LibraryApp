@@ -25,12 +25,13 @@ export default class extends Controller {
   transformData(responseItems = {}) {
     return _.map(responseItems, (member) => {
       const id = _.get(member, 'id', '')
+      const customNumber = _.get(member, 'custom_number', '')
       const personalNumber = _.get(member, 'personal_number', '')
       const name = _.get(member, 'name', '')
 
       return {
         id: id,
-        text: `${id} | ${personalNumber} - ${name}`
+        text: `${customNumber} | ${personalNumber} - ${name}`
       }
     })
   }

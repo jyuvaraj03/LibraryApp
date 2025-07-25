@@ -22,10 +22,11 @@ export default class extends Controller {
       const name = _.get(book, 'name', '')
       const authorName = _.get(book, 'author.name', '')
       const id = _.get(book, 'id', '')
+      const customNumber = _.get(book, 'custom_number', '')
 
       return {
         id: id,
-        text: `#${id} ${name} by ${authorName}`
+        text: `#${customNumber} ${name} by ${authorName}`
       }
     })
   }

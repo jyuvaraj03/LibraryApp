@@ -61,7 +61,7 @@ class BookRental < ApplicationRecord
   end
 
   def borrower_name_id
-    "#{member.name} ##{member.id}"
+    "#{member.name} ##{member.custom_number}"
   end
 
   def borrower_phone
@@ -69,7 +69,7 @@ class BookRental < ApplicationRecord
   end
 
   def borrowed_book
-    "#{book.name} ##{book.id}"
+    "#{book.name} ##{book.custom_number}"
   end
 
   def returned?
