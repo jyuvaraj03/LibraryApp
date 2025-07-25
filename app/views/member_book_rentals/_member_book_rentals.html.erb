@@ -17,7 +17,7 @@
           <td>
             <%= check_box :return, :book_rental_ids, {multiple: true, data: { action: "book-rental-return#handleChecked" }}, book_rental.id, nil %>
           </td>
-          <td><%= book_rental.book.id %></td>
+          <td><%= book_rental.book.custom_number %></td>
           <td><%= book_rental.book.name %></td>
           <td><%= book_rental.issued_on&.to_formatted_s(:long) %></td>
           <td><%= book_rental.due_by&.to_formatted_s(:long) %></td>

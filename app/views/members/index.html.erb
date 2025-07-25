@@ -26,7 +26,7 @@
   <table class="index-table">
     <thead>
     <tr>
-      <th><%= t('activerecord.attributes.member.id') %></th>
+      <th><%= t('activerecord.attributes.member.custom_number') %></th>
       <th><%= t('activerecord.attributes.member.tamil_name') %></th>
       <th><%= t('activerecord.attributes.member.name') %></th>
       <th><%= t('activerecord.attributes.member.personal_number') %></th>
@@ -38,7 +38,7 @@
     <tbody>
     <% @members.each do |member| %>
       <tr>
-        <td><%= member.id %></td>
+        <td><%= member.custom_number %></td>
         <td><%= member.tamil_name %></td>
         <td><%= member.name %></td>
         <td><%= member.personal_number %></td>

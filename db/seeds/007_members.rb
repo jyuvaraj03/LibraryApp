@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 Member.create(
-  id: 1,
   name: 'Vir',
   tamil_name: 'Das',
   personal_number: 7956,
@@ -12,7 +11,6 @@ Member.create(
 )
 
 Member.create(
-  id: 2,
   name: 'Donald',
   tamil_name: 'Glover',
   personal_number: 1234,

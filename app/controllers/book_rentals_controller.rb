@@ -17,7 +17,7 @@ class BookRentalsController < ApplicationController
     authorize BookRental
     @book_rental = BookRental.create(book_rental_params)
     if @book_rental.valid?
-      flash[:snack_success] = I18n.t('successfully_created_rental_due_by', due_by: @book_rental.due_by)
+      flash[:snack_success] = I18n.t('successfully_created_rental_due_by', due_by: @book_rental.due_by&.to_formatted_s(:long))
       redirect_to book_rentals_path
     else
       flash.now[:form_errors] = @book_rental.errors.full_messages

@@ -47,7 +47,8 @@ class BookRental < ApplicationRecord
 
   # TODO: This is broken. It should search by custom number. Change after knowing custom_number pattern
   def self.search_by_id(search_id)
-    where(book_id: search_id).or(where(member_id: search_id))
+    joins(:book, :member)
+      .where("books.custom_number = ? OR members.custom_number = ?", search_id, search_id)
   end
 
   def self.filter_by_show_all(show_all)
@@ -60,7 +61,7 @@ class BookRental < ApplicationRecord
   end
 
   def borrower_name_id
-    "#{member.name} ##{member.id}"
+    "#{member.name} ##{member.custom_number}"
   end
 
   def borrower_phone
@@ -68,7 +69,7 @@ class BookRental < ApplicationRecord
   end
 
   def borrowed_book
-    "#{book.name} ##{book.id}"
+    "#{book.name} ##{book.custom_number}"
   end
 
   def returned?

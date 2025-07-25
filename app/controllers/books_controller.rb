@@ -33,10 +33,18 @@ class BooksController < ApplicationController
   private
 
   def book_params
-    params
+    bp = params
       .require(:book)
       .transform_values { |x| x.strip.gsub(/\s+/, ' ') if x.respond_to?('strip') }
-      .permit(:custom_number, :name, :author_name, :publisher_name, :publishing_year, :category_names)
+      .reject { |_, v| v.blank? }
+      .permit(:custom_number, :name, :author_name, :publisher_name, :publishing_year, :category_names, :auto_assign_custom_number)
+
+    # If auto_assign_custom_number is present and true, remove custom_number so model can auto-assign
+    auto_assign = bp.delete(:auto_assign_custom_number)
+    if auto_assign.present? && ActiveModel::Type::Boolean.new.cast(auto_assign)
+      bp[:custom_number] = nil
+    end
+    bp
   end
 
   def book_search_params

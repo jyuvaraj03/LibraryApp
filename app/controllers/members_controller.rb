@@ -32,11 +32,18 @@ class MembersController < ApplicationController
   end
 
   def member_params
-    params
+    mp = params
       .require(:member)
       .transform_values { |x| x.strip.gsub(/\s+/, ' ') if x.respond_to?('strip') }
-      .reject { |_k, v| v.blank? }
-      .permit(:name, :personal_number, :email, :phone, :tamil_name, :date_of_birth, :date_of_retirement)
+      .reject { |_, v| v.blank? }
+      .permit(:name, :personal_number, :email, :phone, :tamil_name, :date_of_birth, :date_of_retirement, :custom_number, :auto_assign_custom_number)
+
+    # If auto_assign_custom_number is present and true, remove custom_number so model can auto-assign
+    auto_assign = mp.delete(:auto_assign_custom_number)
+    if auto_assign.present? && ActiveModel::Type::Boolean.new.cast(auto_assign)
+      mp[:custom_number] = nil
+    end
+    mp
   end
 
   def member_search_params
