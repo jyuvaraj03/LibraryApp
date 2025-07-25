@@ -33,7 +33,7 @@ class Book < ApplicationRecord
   include CustomNumberAssignable
 
   def self.custom_number_column; :custom_number; end
-  def self.custom_number_prefix; 'B'; end
+  def self.custom_number_prefix; 'BK'; end
   def self.custom_number_length; 6; end
 
   pg_search_scope :search_by_name,

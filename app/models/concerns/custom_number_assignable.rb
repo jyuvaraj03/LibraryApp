@@ -5,22 +5,22 @@ module CustomNumberAssignable
     before_validation :ensure_custom_number
   end
 
-  module ClassMethods
-    # TODO: This method should generate an auto-incrementing custom number
-    def generate_unique_custom_number(prefix = 'C', length = 6, column = :custom_number)
-      loop do
-        number = "#{prefix}#{SecureRandom.hex(length / 2)}"
-        break number unless self.exists?(column => number)
-      end
-    end
-  end
-
   private
 
+  # Ensures the custom number is set before validation.
+  # Example: 'C000012' for prefix 'C', length 6
   def ensure_custom_number
     col = self.class.try(:custom_number_column) || :custom_number
+
+    return if self[col].present?
+
     prefix = self.class.try(:custom_number_prefix) || 'C'
     length = self.class.try(:custom_number_length) || 6
-    self[col] = self[col].presence || self.class.generate_unique_custom_number(prefix, length, col)
+    self.class.transaction do
+      last_pattern = self.class.order(col).lock(true).last&.send(col)
+      last_number = last_pattern ? last_pattern.gsub("#{prefix}", '').to_i : 0
+      new_pattern = "#{prefix}#{(last_number + 1).to_s.rjust(length, '0')}"
+      self[col] = new_pattern
+    end
   end
 end

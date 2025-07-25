@@ -28,7 +28,7 @@ class Member < ApplicationRecord
   include CustomNumberAssignable
 
   def self.custom_number_column; :custom_number; end
-  def self.custom_number_prefix; 'M'; end
+  def self.custom_number_prefix; 'MB'; end
   def self.custom_number_length; 6; end
 
   validates :phone, length: { is: 10 }, uniqueness: true, allow_blank: true
