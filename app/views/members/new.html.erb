@@ -4,18 +4,18 @@
       <p class="text-4xl font-black mb-6"><%= t('create_member') %></p>
       <%= render 'shared/form_error_messages' %>
       <div class="flex flex-col mb-6" data-controller="custom-number">
-        <%= member_form_field(f, :custom_number, :text_field, label_text: t('member_custom_number_label'), placeholder: t('member_custom_number_placeholder'), field_class: 'custom-number-input disabled:bg-gray-200 disabled:cursor-not-allowed', div_class: 'flex flex-col', data: { custom_number_target: 'input' }) %>
+        <%= form_field(f, :custom_number, :text_field, label_text: t('member_custom_number_label'), placeholder: t('member_custom_number_placeholder'), field_class: 'custom-number-input disabled:bg-gray-200 disabled:cursor-not-allowed', div_class: 'flex flex-col', data: { custom_number_target: 'input' }) %>
         <label class="flex items-center gap-2">
           <%= f.check_box :auto_assign_custom_number, { class: 'auto-assign-checkbox', checked: true, data: { action: 'custom-number#toggleInput', custom_number_target: 'checkbox' } }, true, false %>
           <span><%= t('auto_assign_custom_number') %></span>
         </label>
       </div>
-      <%= member_form_field(f, :name, :text_field, required: true, placeholder: t('member_name_placeholder')) %>
-      <%= member_form_field(f, :personal_number, :text_field, required: true, placeholder: t('member_personal_id_placeholder')) %>
-      <%= member_form_field(f, :phone, :text_field, label_text: t('phone_number_label'), placeholder: t('member_phone_placeholder')) %>
-      <%= member_form_field(f, :email, :email_field, placeholder: t('member_email_placeholder')) %>
-      <%= member_form_field(f, :date_of_birth, :date_field, max: Date.today) %>
-      <%= member_form_field(f, :date_of_retirement, :date_field, min: Date.today) %>
+      <%= form_field(f, :name, :text_field, required: true, placeholder: t('member_name_placeholder')) %>
+      <%= form_field(f, :personal_number, :text_field, required: true, placeholder: t('member_personal_id_placeholder')) %>
+      <%= form_field(f, :phone, :text_field, label_text: t('phone_number_label'), placeholder: t('member_phone_placeholder')) %>
+      <%= form_field(f, :email, :email_field, placeholder: t('member_email_placeholder')) %>
+      <%= form_field(f, :date_of_birth, :date_field, max: Date.today) %>
+      <%= form_field(f, :date_of_retirement, :date_field, min: Date.today) %>
       <%= f.submit t('create'), class: "btn-primary" %>
     <% end %>
   </div>
