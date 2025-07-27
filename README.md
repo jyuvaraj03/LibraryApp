@@ -41,6 +41,28 @@ docker compose -f docker-compose.dev.yml exec app bin/dev
 docker compose -f docker-compose.dev.yml down
 ```
 
+## CSV Import/Export
+
+The application includes functionality to import and export books and members as CSV files.
+
+### Rake Tasks
+
+```shell
+# Export books to CSV
+rails csv:export_books
+
+# Export members to CSV  
+rails csv:export_members
+
+# Import books from CSV
+rails csv:import_books FILENAME=books.csv
+
+# Import members from CSV
+rails csv:import_members FILENAME=members.csv
+```
+
+For detailed usage instructions, see [CSV Import/Export Documentation](doc/CSV_IMPORT_EXPORT.md).
+
 ## Deployment
 
 - Deployment uses [Fly.io](https://fly.io/) platform.
