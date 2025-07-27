@@ -37,6 +37,9 @@ module CsvImportExport
     success_count = 0
     error_count = 0
     errors = []
+    total_rows = CSV.read(filepath, headers: true).size
+    processed = 0
+    print "Importing books: 0%"
     CSV.foreach(filepath, headers: true) do |row|
       book_params = {
         custom_number: row['custom_number'],
@@ -53,7 +56,11 @@ module CsvImportExport
         error_count += 1
         errors << "Row #{$.}: #{book.errors.full_messages.join(', ')}"
       end
+      processed += 1
+      percent = ((processed.to_f / total_rows) * 100).to_i
+      print "\rImporting books: #{percent}%"
     end
+    puts "\nImport complete."
     { success_count: success_count, error_count: error_count, errors: errors }
   end
 
@@ -95,6 +102,9 @@ module CsvImportExport
     success_count = 0
     error_count = 0
     errors = []
+    total_rows = CSV.read(filepath, headers: true).size
+    processed = 0
+    print "Importing members: 0%"
     CSV.foreach(filepath, headers: true) do |row|
       member_params = {
         custom_number: row['custom_number'],
@@ -114,7 +124,11 @@ module CsvImportExport
         error_count += 1
         errors << "Row #{$.}: #{member.errors.full_messages.join(', ')}"
       end
+      processed += 1
+      percent = ((processed.to_f / total_rows) * 100).to_i
+      print "\rImporting members: #{percent}%"
     end
+    puts "\nImport complete."
     { success_count: success_count, error_count: error_count, errors: errors }
   end
 end
