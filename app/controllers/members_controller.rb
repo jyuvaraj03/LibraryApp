@@ -26,7 +26,7 @@ class MembersController < ApplicationController
       flash[:snack_success] = I18n.t('successfully_created_member_name', name: @member.name)
       redirect_to members_path
     else
-      flash[:form_errors] = @member.errors.full_messages
+      flash.now[:form_errors] = @member.errors.full_messages
       render 'new'
     end
   end

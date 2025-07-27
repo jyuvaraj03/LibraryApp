@@ -6,7 +6,7 @@
       <div class="flex flex-col mb-6" data-controller="custom-number">
         <%= form_field(f, :custom_number, :text_field, label_text: t('custom_number'), placeholder: t('book_custom_number_placeholder'), field_class: 'custom-number-input disabled:bg-gray-200 disabled:cursor-not-allowed', div_class: 'flex flex-col', data: { custom_number_target: 'input' }) %>
         <label class="flex items-center gap-2">
-          <%= f.check_box :auto_assign_custom_number, { class: 'auto-assign-checkbox', checked: true, data: { action: 'custom-number#toggleInput', custom_number_target: 'checkbox' } }, true, false %>
+          <%= f.check_box :auto_assign_custom_number, { class: 'auto-assign-checkbox', checked: false, data: { action: 'custom-number#toggleInput', custom_number_target: 'checkbox' } }, true, false %>
           <span><%= t('auto_assign_custom_number') %></span>
         </label>
       </div>
