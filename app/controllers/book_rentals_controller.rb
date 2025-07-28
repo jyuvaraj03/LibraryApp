@@ -57,7 +57,6 @@ class BookRentalsController < ApplicationController
   def book_rental_params
     params
       .require(:book_rental)
-      .transform_values { |x| x.is_a?(Array) ? x : (x.respond_to?('strip') ? x.strip.gsub(/\s+/, ' ') : x) }
       .reject { |_k, v| v.blank? }
       .permit(:member_id, :issued_on, book_id: [])
   end

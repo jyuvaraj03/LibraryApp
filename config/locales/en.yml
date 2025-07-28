@@ -91,3 +91,4 @@ en:
   not_authorized: "You are not authorized. Please log in to continue."
   custom_number: "Number"
   auto_assign_custom_number: "Auto-assign number"
+  exceeds_max_rentals: "Member cannot rent more than %{max} books at a time."
