@@ -25,7 +25,7 @@ class BookRentalsControllerTest < ActionDispatch::IntegrationTest
       post book_rentals_path,
            params: {
              book_rental: {
-               book_id: available_book.id,
+               book_id: [available_book.id],
                member_id: member.id,
                issued_on: Date.today.to_formatted_s
              }
@@ -48,7 +48,7 @@ class BookRentalsControllerTest < ActionDispatch::IntegrationTest
       post book_rentals_path,
            params: {
              book_rental: {
-               book_id: unavailable_book.id,
+               book_id: [unavailable_book.id],
                member_id: member.id,
                issued_on: Date.today.to_formatted_s
              }
@@ -72,7 +72,7 @@ class BookRentalsControllerTest < ActionDispatch::IntegrationTest
       post book_rentals_path,
            params: {
              book_rental: {
-               book_id: available_book.id,
+               book_id: [available_book.id],
                member_id: member.id,
                issued_on: Date.today.to_formatted_s
              }
@@ -95,7 +95,7 @@ class BookRentalsControllerTest < ActionDispatch::IntegrationTest
       post book_rentals_path,
            params: {
              book_rental: {
-               book_id: available_book.id,
+               book_id: [available_book.id],
                member_id: member.id,
                issued_on: Date.today.to_formatted_s
              }
@@ -126,5 +126,65 @@ class BookRentalsControllerTest < ActionDispatch::IntegrationTest
     post book_rentals_path
     assert_redirected_to root_path
     assert_equal I18n.t('not_authorized'), flash[:danger]
+  end
+
+  test 'should create multiple book rentals for a member in one request' do
+    member = members(:phineas)
+    books = [books(:five_point_someone), books(:unborrowed)]
+    assert member.book_rentals.current.count == 0
+
+    assert_difference 'BookRental.count', 2 do
+      post book_rentals_path, params: {
+        book_rental: {
+          book_id: books.map(&:id),
+          member_id: member.id,
+          issued_on: Date.today.to_formatted_s
+        }
+      }
+      assert flash[:form_errors].blank?, flash[:form_errors].inspect
+      assert_response :redirect
+      follow_redirect!
+      assert_template 'book_rentals/index'
+    end
+    assert_equal books.map(&:id).sort, member.book_rentals.current.pluck(:book_id).sort
+  end
+
+  test 'should not create rentals if request exceeds max rentals' do
+    member = members(:johnny)
+    # Johnny already has 2 current rentals (MAX_RENTALS)
+    books = [books(:five_point_someone), books(:oliver_twist)]
+    assert member.book_rentals.current.count == BookRental::MAX_RENTALS
+
+    assert_no_difference 'BookRental.count' do
+      post book_rentals_path, params: {
+        book_rental: {
+          book_id: books.map(&:id),
+          member_id: member.id,
+          issued_on: Date.today.to_formatted_s
+        }
+      }
+      assert_template 'book_rentals/new'
+      assert_includes flash[:form_errors].first, I18n.t('exceeds_max_rentals', max: BookRental::MAX_RENTALS)
+    end
+  end
+
+  test 'should not create any rentals if one book is unavailable (transaction rollback)' do
+    member = members(:phineas)
+    available = books(:five_point_someone)
+    unavailable = book_rentals(:unreturned).book
+    assert member.book_rentals.current.count == 0
+
+    assert_no_difference 'BookRental.count' do
+      post book_rentals_path, params: {
+        book_rental: {
+          book_id: [available.id, unavailable.id],
+          member_id: member.id,
+          issued_on: Date.today.to_formatted_s
+        }
+      }
+      assert_template 'book_rentals/new'
+      assert flash[:form_errors].present?
+      assert member.book_rentals.current.empty?
+    end
   end
 end

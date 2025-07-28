@@ -4,14 +4,14 @@ import "tom-select/dist/css/tom-select.bootstrap5.min.css"
 import _ from "lodash"
 import {tomSelectLoad} from "../utils/tom_select";
 
-// Connects to data-controller="searchable-select"
 export default class extends Controller {
-  static values = { url: String, filterParams: Object }
+  static values = { url: String, filterParams: Object, maxBooks: Number }
 
   connect() {
     new TomSelect(this.element, {
       valueField: 'id',
       searchField: ['text'],
+      maxItems: this.maxBooksValue,
       load: (query, callback) => tomSelectLoad(query, callback, this.filterParamsValue,
         this.urlValue, this.transformData)
     })
