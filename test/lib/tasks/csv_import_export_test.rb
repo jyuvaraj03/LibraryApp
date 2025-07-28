@@ -101,4 +101,49 @@ class CsvImportExportTest < ActiveSupport::TestCase
   ensure
     File.delete(csv_file) if File.exist?(csv_file)
   end
+
+  test 'import_members_from_csv upserts existing member' do
+    # Create initial member
+    member = Member.create!(custom_number: 'IM002', personal_number: 11111, name: 'Original Name', tamil_name: 'மூல உறுப்பினர்', email: 'orig@example.com', phone: '1234567890', section: 'Finance', date_of_birth: Date.new(1980, 1, 1), date_of_retirement: Date.new(2030, 1, 1))
+    filename = 'members_import_upsert_test.csv'
+    csv_file = File.join(@temp_dir, filename)
+    CSV.open(csv_file, 'w', headers: true) do |csv|
+      csv << %w[custom_number personal_number name tamil_name email phone section date_of_birth date_of_retirement]
+      csv << ['IM002', '22222', 'Updated Name', 'புதுப்பிக்கப்பட்ட உறுப்பினர்', 'updated@example.com', '0987654321', 'Legal', '1981-02-02', '2031-02-02']
+    end
+    result = CsvImportExport.import_members_from_csv(filename)
+    assert_equal 1, result[:success_count]
+    member.reload
+    assert_equal 'Updated Name', member.name
+    assert_equal 'புதுப்பிக்கப்பட்ட உறுப்பினர்', member.tamil_name
+    assert_equal 'updated@example.com', member.email
+    assert_equal '0987654321', member.phone
+    assert_equal 'Legal', member.section
+    assert_equal Date.new(1981, 2, 2), member.date_of_birth
+    assert_equal Date.new(2031, 2, 2), member.date_of_retirement
+  ensure
+    File.delete(csv_file) if File.exist?(csv_file)
+  end
+
+  test 'import_members_from_csv inserts new member if custom_number does not exist' do
+    filename = 'members_import_new_test.csv'
+    csv_file = File.join(@temp_dir, filename)
+    CSV.open(csv_file, 'w', headers: true) do |csv|
+      csv << %w[custom_number personal_number name tamil_name email phone section date_of_birth date_of_retirement]
+      csv << ['IM003', '33333', 'New Member', 'புதிய உறுப்பினர்', 'new@example.com', '1231231234', 'Admin', '1995-03-03', '2040-03-03']
+    end
+    result = CsvImportExport.import_members_from_csv(filename)
+    assert_equal 1, result[:success_count]
+    member = Member.find_by(custom_number: 'IM003')
+    assert_not_nil member
+    assert_equal 'New Member', member.name
+    assert_equal 'புதிய உறுப்பினர்', member.tamil_name
+    assert_equal 'new@example.com', member.email
+    assert_equal '1231231234', member.phone
+    assert_equal 'Admin', member.section
+    assert_equal Date.new(1995, 3, 3), member.date_of_birth
+    assert_equal Date.new(2040, 3, 3), member.date_of_retirement
+  ensure
+    File.delete(csv_file) if File.exist?(csv_file)
+  end
 end

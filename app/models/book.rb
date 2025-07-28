@@ -69,24 +69,39 @@ class Book < ApplicationRecord
     where(custom_number: search_id).or(where(id: search_id))
   end
 
-
   def self.create_with_associated_models(hash = {})
-    Book.transaction do
-      author = Author.find_or_create_by(name: hash[:author_name])
-      publisher = Publisher.find_or_create_by(name: hash[:publisher_name])
-      categories = hash[:category_names]&.split(',')&.map do |category_name|
-        Category.find_or_create_by(name: category_name.strip)
-      end&.compact || []
+    self.upsert_or_create_with_associated_models(hash, :create)
+  end
 
-
-      @new_book = Book.create(custom_number: hash[:custom_number], name: hash[:name], author: author, publisher: publisher,
-                              publishing_year: hash[:publishing_year], categories: categories)
-      raise ActiveRecord::Rollback if @new_book.invalid?
-    end
-    @new_book
+  def self.upsert_with_associated_models(hash = {})
+    self.upsert_or_create_with_associated_models(hash, :upsert)
   end
 
   def available?
     !BookRental.exists?(book_id: id, returned_on: nil)
+  end
+
+  private
+
+  def self.upsert_or_create_with_associated_models(hash, mode)
+    book = nil
+    Book.transaction do
+      author = Author.find_or_initialize_by(name: hash[:author_name])
+      publisher = Publisher.find_or_initialize_by(name: hash[:publisher_name])
+      categories = hash[:category_names]&.split(',')&.map do |category_name|
+        Category.find_or_initialize_by(name: category_name.strip)
+      end&.compact || Category.none
+
+      book =
+        if mode == :upsert
+          Book.find_or_initialize_by(custom_number: hash[:custom_number])
+        else
+          Book.new(custom_number: hash[:custom_number])
+        end
+      book.update(name: hash[:name], author: author, publisher: publisher,
+                  publishing_year: hash[:publishing_year], categories: categories)
+      raise ActiveRecord::Rollback if book.invalid?
+    end
+    book
   end
 end

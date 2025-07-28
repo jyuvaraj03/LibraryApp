@@ -343,4 +343,72 @@ class BookTest < ActiveSupport::TestCase
     filter_results = Book.filter_by_availability('random')
     assert_equal Book.all, filter_results
   end
+
+  test 'upsert_with_associated_models updates existing book and associations' do
+    # Create initial book
+    book = Book.create_with_associated_models(name: @book_name, author_name: @author_name,
+                                              publisher_name: @publisher_name, publishing_year: @publishing_year,
+                                              category_names: @categories)
+    assert book.valid?
+    original_id = book.id
+    # Upsert with same custom_number, different name and associations
+    new_name = 'Updated Book Name'
+    new_author = 'New Author'
+    new_publisher = 'New Publisher'
+    new_categories = 'UpdatedCat1, UpdatedCat2'
+    upserted_book = Book.upsert_with_associated_models(custom_number: book.custom_number,
+                                                       name: new_name,
+                                                       author_name: new_author,
+                                                       publisher_name: new_publisher,
+                                                       publishing_year: 2020,
+                                                       category_names: new_categories)
+    assert upserted_book.valid?
+    assert_equal original_id, upserted_book.id, 'Upsert should not create a new book record'
+    assert_equal new_name, upserted_book.name
+    assert_equal new_author, upserted_book.author.name
+    assert_equal new_publisher, upserted_book.publisher.name
+    assert_equal 2020, upserted_book.publishing_year
+    assert_equal ['UpdatedCat1', 'UpdatedCat2'], upserted_book.categories.map(&:name).sort
+  end
+
+  test 'upsert_with_associated_models does not create duplicate authors, publishers, or categories' do
+    # Create initial book
+    book = Book.create_with_associated_models(name: @book_name, author_name: @author_name,
+                                              publisher_name: @publisher_name, publishing_year: @publishing_year,
+                                              category_names: @categories)
+    assert book.valid?
+    # Upsert with same associations
+    assert_no_difference ['Author.count', 'Publisher.count', 'Category.count'] do
+      upserted_book = Book.upsert_with_associated_models(custom_number: book.custom_number,
+                                                        name: @book_name,
+                                                        author_name: @author_name,
+                                                        publisher_name: @publisher_name,
+                                                        publishing_year: @publishing_year,
+                                                        category_names: @categories)
+      assert upserted_book.valid?
+    end
+  end
+
+  test 'upsert_with_associated_models creates a new book if custom_number does not exist' do
+    custom_number = 'BK999999'
+    new_name = 'Brand New Book'
+    new_author = 'Fresh Author'
+    new_publisher = 'Fresh Publisher'
+    new_categories = 'FreshCat1, FreshCat2'
+    assert_difference 'Book.count', 1 do
+      book = Book.upsert_with_associated_models(custom_number: custom_number,
+                                                name: new_name,
+                                                author_name: new_author,
+                                                publisher_name: new_publisher,
+                                                publishing_year: 2025,
+                                                category_names: new_categories)
+      assert book.valid?
+      assert_equal custom_number, book.custom_number
+      assert_equal new_name, book.name
+      assert_equal new_author, book.author.name
+      assert_equal new_publisher, book.publisher.name
+      assert_equal 2025, book.publishing_year
+      assert_equal ['FreshCat1', 'FreshCat2'], book.categories.map(&:name).sort
+    end
+  end
 end

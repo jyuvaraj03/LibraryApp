@@ -49,7 +49,7 @@ module CsvImportExport
         publisher_name: row['publisher_name'],
         category_names: row['category_names']
       }
-      book = Book.create_with_associated_models(book_params)
+      book = Book.upsert_with_associated_models(book_params)
       if book.persisted? && book.valid?
         success_count += 1
       else
@@ -106,8 +106,8 @@ module CsvImportExport
     processed = 0
     print "Importing members: 0%"
     CSV.foreach(filepath, headers: true) do |row|
+      custom_number = row['custom_number']
       member_params = {
-        custom_number: row['custom_number'],
         personal_number: row['personal_number']&.to_i,
         name: row['name'],
         tamil_name: row['tamil_name'],
@@ -117,7 +117,8 @@ module CsvImportExport
         date_of_birth: row['date_of_birth'].present? ? Date.parse(row['date_of_birth']) : nil,
         date_of_retirement: row['date_of_retirement'].present? ? Date.parse(row['date_of_retirement']) : nil
       }
-      member = Member.new(member_params)
+      member = Member.find_or_initialize_by(custom_number:)
+      member.assign_attributes(member_params)
       if member.save
         success_count += 1
       else
