@@ -43,23 +43,16 @@ class MembersControllerTest < ActionDispatch::IntegrationTest
       assert_response :redirect
       member = Member.find_by(personal_number: 1234)
       assert_equal 'M999999', member.custom_number
-
-      # Auto-assign custom_number
-      post members_path, params: { member: { name: 'Auto Member', personal_number: 1235, auto_assign_custom_number: true } }
-      assert_response :redirect
-      auto_member = Member.find_by(personal_number: 1235)
-      assert auto_member.custom_number.present?
-      assert_match /^M\S+$/, auto_member.custom_number
     end
   end
 
   test 'should throw flash when creating a second member with same mobile number' do
     log_in_as staffs(:admino)
     assert_difference 'Member.count' do
-      post members_path, params: { member: { name: 'New Member', personal_number: 1234, phone: '9876543210' } }
+      post members_path, params: { member: { name: 'New Member', personal_number: 1234, phone: '9876543210', custom_number: 'M999999' } }
       assert_response :redirect
     end
-    post members_path, params: { member: { name: 'New member 2', personal_number: 2345, phone: '9876543210' } }
+    post members_path, params: { member: { name: 'New member 2', personal_number: 2345, phone: '9876543210', custom_number: 'M999999' } }
     assert_not_nil flash[:form_errors]
     assert_response :success
   end

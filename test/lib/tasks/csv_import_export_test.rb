@@ -54,7 +54,7 @@ class CsvImportExportTest < ActiveSupport::TestCase
   end
 
   test 'export_members_to_csv writes correct data' do
-    Member.create!(name: 'Test Member', personal_number: 12345, email: 'test@example.com', phone: '9998887777', section: 'IT', date_of_birth: Date.new(1990, 1, 1), date_of_retirement: Date.new(2025, 12, 31))
+    Member.create!(name: 'Test Member', personal_number: 12345, custom_number: 'M999999', email: 'test@example.com', phone: '9998887777', section: 'IT', date_of_birth: Date.new(1990, 1, 1), date_of_retirement: Date.new(2025, 12, 31))
     filename = 'members_export_test.csv'
     filepath = CsvImportExport.export_members_to_csv(filename)
     assert File.exist?(filepath), 'CSV file should be created'
