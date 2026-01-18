@@ -396,18 +396,40 @@ class BookTest < ActiveSupport::TestCase
     end
   end
 
+  test 'only non-negative price values are allowed' do
+    book = Book.new(
+      custom_number: @custom_number,
+      name: 'New Book',
+      publishing_year: 2019,
+      author: @author,
+      categories: [@category1, @category2],
+      publisher: @publisher,
+      price: nil
+    )
+    assert book.valid?
+    book.price = 0
+    assert book.valid?
+    book.price = 100
+    assert book.valid?
+    book.price = 101.10
+    assert book.valid?
+    book.price = -100.40
+    assert book.invalid?
+  end
+
   private
 
   def create_book_with_associated_models(name: @book_name, author_name: @author_name,
                                           publisher_name: @publisher_name, publishing_year: @publishing_year,
-                                          category_names: @categories, custom_number: @custom_number)
+                                          category_names: @categories, custom_number: @custom_number, price: nil)
     Book.create_with_associated_models(
       name: name,
       author_name: author_name,
       publisher_name: publisher_name,
       publishing_year: publishing_year,
       category_names: category_names,
-      custom_number: custom_number
+      custom_number: custom_number,
+      price: price
     )
   end
 end

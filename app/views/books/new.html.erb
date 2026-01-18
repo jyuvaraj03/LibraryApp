@@ -12,6 +12,7 @@
         <%= form_field(f, :category_names, :text_field, label_text: t('category_names_label'), placeholder: t('book_categories_placeholder'), div_class: 'flex flex-col') %>
         <small class="p-1 text-gray-400"><%= t('comma_separated') %></small>
       </div>
+      <%= form_field(f, :price, :number_field, label_text: t('price_label'), placeholder: t('book_price_placeholder')) %>
       <%= f.submit t('create'), class: "btn-primary" %>
     <% end %>
   </div>

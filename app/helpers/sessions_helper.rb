@@ -32,6 +32,10 @@ module SessionsHelper
     !current_staff.nil?
   end
 
+  def logged_in_as_admin?
+    logged_in? && current_staff.admin?
+  end
+
   def log_out
     forget(current_staff)
     session.delete(:staff_id)

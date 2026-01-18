@@ -47,7 +47,8 @@ module CsvImportExport
         publishing_year: row['publishing_year']&.to_i,
         author_name: row['author_name'],
         publisher_name: row['publisher_name'],
-        category_names: row['category_names']
+        category_names: row['category_names'],
+        price: row['price']
       }
       book = Book.upsert_with_associated_models(book_params)
       if book.persisted? && book.valid?

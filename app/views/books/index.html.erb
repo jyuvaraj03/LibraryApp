@@ -38,6 +38,9 @@
       <th><%= t('activerecord.models.author') %></th>
       <th><%= t('activerecord.models.publisher') %></th>
       <th><%= t('activerecord.attributes.book.publishing_year') %></th>
+      <% if logged_in_as_admin? %>
+        <th><%= t('activerecord.attributes.book.price') %></th>
+      <% end %>
       <th><%= t('categories') %></th>
     </tr>
     </thead>
@@ -56,6 +59,9 @@
         <td><%= book.author&.name %></td>
         <td><%= book.publisher&.name %></td>
         <td><%= book.publishing_year %></td>
+        <% if logged_in_as_admin? %>
+          <td><%= display_price(book) %></td>
+        <% end %>
         <td><%= book.categories&.map { |c| c&.name }.join(', ') %></td>
       </tr>
     <% end %>

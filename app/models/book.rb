@@ -30,11 +30,8 @@ class Book < ApplicationRecord
   # validates :custom_number, presence: true
   validates :name, presence: true
   validates :publishing_year, numericality: { allow_nil: true, less_than_or_equal_to: Time.now.year }
-  include CustomNumberAssignable
-
-  def self.custom_number_column; :custom_number; end
-  def self.custom_number_prefix; 'BK'; end
-  def self.custom_number_length; 6; end
+  validates :custom_number, presence: true, uniqueness: true
+  validates :price, numericality: { allow_nil: true, greater_than_or_equal_to: 0 }
 
   pg_search_scope :search_by_name,
                   against: %i[name],
