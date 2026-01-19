@@ -146,4 +146,41 @@ class CsvImportExportTest < ActiveSupport::TestCase
   ensure
     File.delete(csv_file) if File.exist?(csv_file)
   end
+  test 'import_books_from_csv with dry_run does not persist data' do
+    filename = 'books_import_dry_run_test.csv'
+    csv_file = File.join(@temp_dir, filename)
+    CSV.open(csv_file, 'w', headers: true) do |csv|
+      csv << %w[custom_number name publishing_year author_name publisher_name category_names]
+      csv << ['IB999', 'Dry Run Book', '2023', 'Dry Author', 'Dry Publisher', 'Dry Category']
+    end
+
+    assert_no_difference 'Book.count' do
+      result = CsvImportExport.import_books_from_csv(filename, dry_run: true)
+      assert_equal 1, result[:success_count]
+      assert_equal 0, result[:error_count]
+    end
+
+    assert_nil Book.find_by(custom_number: 'IB999')
+  ensure
+    File.delete(csv_file) if File.exist?(csv_file)
+  end
+
+  test 'import_members_from_csv with dry_run does not persist data' do
+    filename = 'members_import_dry_run_test.csv'
+    csv_file = File.join(@temp_dir, filename)
+    CSV.open(csv_file, 'w', headers: true) do |csv|
+      csv << %w[custom_number personal_number name tamil_name email phone section date_of_birth date_of_retirement]
+      csv << ['IM999', '99999', 'Dry Member', 'உலர்ந்த உறுப்பினர்', 'dry@example.com', '1234567890', 'Dry', '1990-01-01', '2030-01-01']
+    end
+
+    assert_no_difference 'Member.count' do
+      result = CsvImportExport.import_members_from_csv(filename, dry_run: true)
+      assert_equal 1, result[:success_count]
+      assert_equal 0, result[:error_count]
+    end
+
+    assert_nil Member.find_by(custom_number: 'IM999')
+  ensure
+    File.delete(csv_file) if File.exist?(csv_file)
+  end
 end
