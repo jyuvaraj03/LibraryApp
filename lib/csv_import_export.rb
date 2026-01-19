@@ -31,37 +31,49 @@ module CsvImportExport
     filepath
   end
 
-  def import_books_from_csv(filename)
+  def import_books_from_csv(filename, dry_run: false)
     filepath = Rails.root.join('tmp', filename)
     raise "File #{filepath} does not exist" unless File.exist?(filepath)
+
     success_count = 0
+    updated_count = 0
     error_count = 0
     errors = []
     total_rows = CSV.read(filepath, headers: true).size
     processed = 0
+
+    puts "Starting import in #{dry_run ? 'DRY RUN' : 'LIVE'} mode..."
     print "Importing books: 0%"
-    CSV.foreach(filepath, headers: true) do |row|
-      book_params = {
-        custom_number: row['custom_number'],
-        name: row['name'],
-        publishing_year: row['publishing_year']&.to_i,
-        author_name: row['author_name'],
-        publisher_name: row['publisher_name'],
-        category_names: row['category_names']
-      }
-      book = Book.upsert_with_associated_models(book_params)
-      if book.persisted? && book.valid?
-        success_count += 1
-      else
-        error_count += 1
-        errors << "Row #{$.}: #{book.errors.full_messages.join(', ')}"
+
+    ActiveRecord::Base.transaction do
+      CSV.foreach(filepath, headers: true) do |row|
+        book_params = {
+          custom_number: row['custom_number'],
+          name: row['name'],
+          publishing_year: row['publishing_year']&.to_i,
+          author_name: row['author_name'],
+          publisher_name: row['publisher_name'],
+          category_names: row['category_names'],
+          price: row['price']
+        }
+        book_exists = Book.find_by(custom_number: row['custom_number']).present?
+        book = Book.upsert_with_associated_models(book_params)
+        if book.persisted? && book.valid?
+          updated_count += 1 if book_exists
+          success_count += 1
+        else
+          error_count += 1
+          errors << "Row #{$.}: #{book.errors.full_messages.join(', ')}\n#{row.inspect}"
+        end
+        processed += 1
+        percent = ((processed.to_f / total_rows) * 100).to_i
+        print "\rImporting books: #{percent}%"
       end
-      processed += 1
-      percent = ((processed.to_f / total_rows) * 100).to_i
-      print "\rImporting books: #{percent}%"
+      raise ActiveRecord::Rollback if dry_run
     end
+    puts "\nImport filtered." if dry_run
     puts "\nImport complete."
-    { success_count: success_count, error_count: error_count, errors: errors }
+    { success_count: success_count, updated_count: updated_count, error_count: error_count, errors: errors }
   end
 
   def export_members_to_csv(filename = nil)
@@ -96,40 +108,50 @@ module CsvImportExport
     filepath
   end
 
-  def import_members_from_csv(filename)
+  def import_members_from_csv(filename, date_format = '%Y-%m-%d', dry_run: false)
     filepath = Rails.root.join('tmp', filename)
     raise "File #{filepath} does not exist" unless File.exist?(filepath)
+
     success_count = 0
+    updated_count = 0
     error_count = 0
     errors = []
     total_rows = CSV.read(filepath, headers: true).size
     processed = 0
+
+    puts "Starting import in #{dry_run ? 'DRY RUN' : 'LIVE'} mode..."
     print "Importing members: 0%"
-    CSV.foreach(filepath, headers: true) do |row|
-      custom_number = row['custom_number']
-      member_params = {
-        personal_number: row['personal_number']&.to_i,
-        name: row['name'],
-        tamil_name: row['tamil_name'],
-        email: row['email'].presence,
-        phone: row['phone'].presence,
-        section: row['section'],
-        date_of_birth: row['date_of_birth'].present? ? Date.parse(row['date_of_birth']) : nil,
-        date_of_retirement: row['date_of_retirement'].present? ? Date.parse(row['date_of_retirement']) : nil
-      }
-      member = Member.find_or_initialize_by(custom_number:)
-      member.assign_attributes(member_params)
-      if member.save
-        success_count += 1
-      else
-        error_count += 1
-        errors << "Row #{$.}: #{member.errors.full_messages.join(', ')}"
+
+    ActiveRecord::Base.transaction do
+      CSV.foreach(filepath, headers: true) do |row|
+        custom_number = row['custom_number']
+        member_params = {
+          personal_number: row['personal_number']&.to_i,
+          name: row['name'],
+          tamil_name: row['tamil_name'],
+          email: row['email'].presence,
+          phone: row['phone'].presence,
+          section: row['section'],
+          date_of_birth: row['date_of_birth'].present? ? Date.strptime(row['date_of_birth'], date_format) : nil,
+          date_of_retirement: row['date_of_retirement'].present? ? Date.strptime(row['date_of_retirement'], date_format) : nil
+        }
+        member = Member.find_or_initialize_by(custom_number:)
+        member.assign_attributes(member_params)
+        if member.save
+          updated_count += 1 unless member.previously_new_record?
+          success_count += 1
+        else
+          error_count += 1
+          errors << "Row #{$.}: #{member.errors.full_messages.join(', ')}"
+        end
+        processed += 1
+        percent = ((processed.to_f / total_rows) * 100).to_i
+        print "\rImporting members: #{percent}%"
       end
-      processed += 1
-      percent = ((processed.to_f / total_rows) * 100).to_i
-      print "\rImporting members: #{percent}%"
+      raise ActiveRecord::Rollback if dry_run
     end
+    puts "\nImport filtered." if dry_run
     puts "\nImport complete."
-    { success_count: success_count, error_count: error_count, errors: errors }
+    { success_count: success_count, updated_count: updated_count, error_count: error_count, errors: errors }
   end
 end

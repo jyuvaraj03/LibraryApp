@@ -16,7 +16,8 @@ class CreateMemberTest < ActionDispatch::IntegrationTest
            params: {
              member: {
                name: 'Barack',
-               personal_number: 6789
+               personal_number: 6789,
+               custom_number: 'M999999'
              }
            }
       assert_response :redirect
@@ -31,13 +32,14 @@ class CreateMemberTest < ActionDispatch::IntegrationTest
     assert_template 'members/new'
 
     assert_no_difference 'Member.count' do
-      post members_path,
+      post(members_path,
            params: {
              member: {
                name: 'Barack',
-               personal_number: nil
+               personal_number: nil,
+               custom_number: 'M999999'
              }
-           }
+           })
       assert_response :success
       assert_template 'members/new'
       assert_not_nil flash[:form_errors]
@@ -47,17 +49,18 @@ class CreateMemberTest < ActionDispatch::IntegrationTest
   test 'should use nil values for fields posted with empty strings' do
     assert_difference 'Member.count' do
       post members_path,
-           params: {
-             member: {
-               name: 'Barack',
-               personal_number: 214,
-               email: '',
-               phone: '',
-               tamil_name: '',
-               date_of_birth: '',
-               date_of_retirement: ''
-             }
-           }
+              params: {
+                member: {
+                  name: 'Barack',
+                  personal_number: 214,
+                  custom_number: 'M999999',
+                  email: '',
+                  phone: '',
+                  tamil_name: '',
+                  date_of_birth: '',
+                  date_of_retirement: ''
+                }
+              }
       assert_response :redirect
       follow_redirect!
       assert_response :success

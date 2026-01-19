@@ -54,7 +54,7 @@ class CsvImportExportTest < ActiveSupport::TestCase
   end
 
   test 'export_members_to_csv writes correct data' do
-    Member.create!(name: 'Test Member', personal_number: 12345, email: 'test@example.com', phone: '9998887777', section: 'IT', date_of_birth: Date.new(1990, 1, 1), date_of_retirement: Date.new(2025, 12, 31))
+    Member.create!(name: 'Test Member', personal_number: 12345, custom_number: 'M999999', email: 'test@example.com', phone: '9998887777', section: 'IT', date_of_birth: Date.new(1990, 1, 1), date_of_retirement: Date.new(2025, 12, 31))
     filename = 'members_export_test.csv'
     filepath = CsvImportExport.export_members_to_csv(filename)
     assert File.exist?(filepath), 'CSV file should be created'
@@ -143,6 +143,43 @@ class CsvImportExportTest < ActiveSupport::TestCase
     assert_equal 'Admin', member.section
     assert_equal Date.new(1995, 3, 3), member.date_of_birth
     assert_equal Date.new(2040, 3, 3), member.date_of_retirement
+  ensure
+    File.delete(csv_file) if File.exist?(csv_file)
+  end
+  test 'import_books_from_csv with dry_run does not persist data' do
+    filename = 'books_import_dry_run_test.csv'
+    csv_file = File.join(@temp_dir, filename)
+    CSV.open(csv_file, 'w', headers: true) do |csv|
+      csv << %w[custom_number name publishing_year author_name publisher_name category_names]
+      csv << ['IB999', 'Dry Run Book', '2023', 'Dry Author', 'Dry Publisher', 'Dry Category']
+    end
+
+    assert_no_difference 'Book.count' do
+      result = CsvImportExport.import_books_from_csv(filename, dry_run: true)
+      assert_equal 1, result[:success_count]
+      assert_equal 0, result[:error_count]
+    end
+
+    assert_nil Book.find_by(custom_number: 'IB999')
+  ensure
+    File.delete(csv_file) if File.exist?(csv_file)
+  end
+
+  test 'import_members_from_csv with dry_run does not persist data' do
+    filename = 'members_import_dry_run_test.csv'
+    csv_file = File.join(@temp_dir, filename)
+    CSV.open(csv_file, 'w', headers: true) do |csv|
+      csv << %w[custom_number personal_number name tamil_name email phone section date_of_birth date_of_retirement]
+      csv << ['IM999', '99999', 'Dry Member', 'உலர்ந்த உறுப்பினர்', 'dry@example.com', '1234567890', 'Dry', '1990-01-01', '2030-01-01']
+    end
+
+    assert_no_difference 'Member.count' do
+      result = CsvImportExport.import_members_from_csv(filename, dry_run: true)
+      assert_equal 1, result[:success_count]
+      assert_equal 0, result[:error_count]
+    end
+
+    assert_nil Member.find_by(custom_number: 'IM999')
   ensure
     File.delete(csv_file) if File.exist?(csv_file)
   end

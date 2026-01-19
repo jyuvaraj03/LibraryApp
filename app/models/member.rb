@@ -24,14 +24,7 @@ class Member < ApplicationRecord
 
   validates :name, presence: true
   validates :personal_number, presence: true, uniqueness: true, numericality: { greater_than: 0 }
-
-  include CustomNumberAssignable
-
-  def self.custom_number_column; :custom_number; end
-  def self.custom_number_prefix; 'MB'; end
-  def self.custom_number_length; 6; end
-
-  validates :phone, length: { is: 10 }, uniqueness: true, allow_blank: true
+  validates :custom_number, presence: true, uniqueness: true
 
   pg_search_scope :search_by_name,
                   against: %i[name tamil_name],

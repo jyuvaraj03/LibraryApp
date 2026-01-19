@@ -17,8 +17,9 @@ namespace :csv do
   task import_books: :environment do
     filename = ENV['FILENAME'] || raise('Please specify FILENAME environment variable')
     begin
-      result = CsvImportExport.import_books_from_csv(filename)
-      puts "Import completed: #{result[:success_count]} books imported successfully, #{result[:error_count]} errors"
+      dry_run = ENV['DRY_RUN'] == 'true'
+      result = CsvImportExport.import_books_from_csv(filename, dry_run: dry_run)
+      puts "Import completed: #{result[:success_count]} books imported successfully, #{result[:error_count]} errors, #{result[:updated_count]} updated"
       if result[:errors].any?
         puts "\nErrors:"
         result[:errors].each { |error| puts "  #{error}" }
@@ -32,7 +33,7 @@ namespace :csv do
   desc 'Export all members to CSV'
   task export_members: :environment do
     filename = ENV['FILENAME']
-    filepath = CsvImportExport.export_members_to_csv(filename)
+    filepath = CsvImportExport.export_members_to_csv(filename, date_format)
     member_count = Member.count
     puts "Successfully exported #{member_count} members to #{filepath}"
   end
@@ -40,9 +41,11 @@ namespace :csv do
   desc 'Import members from CSV'
   task import_members: :environment do
     filename = ENV['FILENAME'] || raise('Please specify FILENAME environment variable')
+    date_format = ENV['DATE_FORMAT'] || '%Y-%m-%d' # Refer: https://ruby-doc.org/stdlib-2.1.2/libdoc/date/rdoc/Date.html#method-c-strptime
     begin
-      result = CsvImportExport.import_members_from_csv(filename)
-      puts "Import completed: #{result[:success_count]} members imported successfully, #{result[:error_count]} errors"
+      dry_run = ENV['DRY_RUN'] == 'true'
+      result = CsvImportExport.import_members_from_csv(filename, date_format, dry_run: dry_run)
+      puts "Import completed: #{result[:success_count]} members imported successfully, #{result[:error_count]} errors, #{result[:updated_count]} updated"
       if result[:errors].any?
         puts "\nErrors:"
         result[:errors].each { |error| puts "  #{error}" }

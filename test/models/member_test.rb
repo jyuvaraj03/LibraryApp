@@ -63,17 +63,6 @@ class MemberTest < ActiveSupport::TestCase
     assert @member.valid?
   end
 
-  test 'phone number should be 10 digits' do
-    @member.phone = '123456789'
-    assert @member.invalid?
-
-    @member.phone = '12345678901'
-    assert @member.invalid?
-
-    @member.phone = '1234567890'
-    assert @member.valid?
-  end
-
   test 'multiple nil phones can be present' do
     @member.phone = nil
     @member.save!

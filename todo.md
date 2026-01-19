@@ -1,0 +1,7 @@
+- Book rental clear book input on enter
+- Renewal show renewal on the page
+- Member delete
+- Ability to change member type (retired, normal, annual member, dead or canceled) and show (and filter) it in the list
+- Annual member - show banner to prohibit rental
+- Dead or canceled remove from rental list
+- Price of books

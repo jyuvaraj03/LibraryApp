@@ -17,16 +17,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_difference 'Book.count', 1 do
-      post books_path,
-           params: {
-             book: {
-               name: 'Da Vinci Code',
-               author_name: 'Dan Brown',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '2010',
-               category_names: 'Mystery, Crime'
-             }
-           }
+      post books_path, params: { book: book_params }
       assert_response :redirect
       follow_redirect!
       assert_response :success
@@ -39,16 +30,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
 
     assert_difference 'Book.count', 1 do
       assert_no_difference 'Author.count' do
-        post books_path,
-             params: {
-               book: {
-                 name: 'Da Vinci Code',
-                 author_name: @author.name,
-                 publisher_name: 'Penguin Labs',
-                 publishing_year: '2010',
-                 category_names: 'Mystery, Crime'
-               }
-             }
+        post books_path, params: { book: book_params(author_name: @author.name) }
         assert_response :redirect
         follow_redirect!
         assert_response :success
@@ -62,16 +44,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
 
     assert_difference 'Book.count', 1 do
       assert_no_difference 'Publisher.count' do
-        post books_path,
-             params: {
-               book: {
-                 name: 'Da Vinci Code',
-                 author_name: 'Dan Brown',
-                 publisher_name: @publisher.name,
-                 publishing_year: '2010',
-                 category_names: 'Mystery, Crime'
-               }
-             }
+        post books_path, params: { book: book_params(publisher_name: @publisher.name) }
         assert_response :redirect
         follow_redirect!
         assert_response :success
@@ -85,16 +58,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
 
     assert_difference 'Book.count', 1 do
       assert_no_difference 'Category.count' do
-        post books_path,
-             params: {
-               book: {
-                 name: 'Da Vinci Code',
-                 author_name: 'Dan Brown',
-                 publisher_name: 'Penguin Labs',
-                 publishing_year: '2010',
-                 category_names: @category1.name
-               }
-             }
+        post books_path, params: { book: book_params(category_names: @category1.name) }
         assert_response :redirect
         follow_redirect!
         assert_response :success
@@ -107,16 +71,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_difference 'Book.count', 1 do
-      post books_path,
-           params: {
-             book: {
-               name: 'Da Vinci Code',
-               author_name: 'Dan Brown',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '2010',
-               category_names: ''
-             }
-           }
+      post books_path, params: { book: book_params(category_names: '') }
       assert_response :redirect
       follow_redirect!
       assert_response :success
@@ -128,16 +83,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_difference 'Book.count', 1 do
-      post books_path,
-           params: {
-             book: {
-               name: 'Da Vinci Code',
-               author_name: 'Dan Brown',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '',
-               category_names: 'Mystery, Thriller'
-             }
-           }
+      post books_path, params: { book: book_params(publishing_year: '', category_names: 'Mystery, Thriller') }
       assert_response :redirect
       follow_redirect!
       assert_response :success
@@ -149,16 +95,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_difference 'Book.count', 1 do
-      post books_path,
-           params: {
-             book: {
-               name: 'Da Vinci Code',
-               author_name: 'Dan Brown',
-               publisher_name: '',
-               publishing_year: '2010',
-               category_names: 'Mystery, Thriller'
-             }
-           }
+      post books_path, params: { book: book_params(publisher_name: '', category_names: 'Mystery, Thriller') }
       assert_response :redirect
       follow_redirect!
       assert_response :success
@@ -170,16 +107,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_difference 'Book.count', 1 do
-      post books_path,
-           params: {
-             book: {
-               name: 'Da Vinci Code',
-               author_name: '',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '2010',
-               category_names: 'Mystery, Thriller'
-             }
-           }
+      post books_path, params: { book: book_params(author_name: '', category_names: 'Mystery, Thriller') }
       assert_response :redirect
       follow_redirect!
       assert_response :success
@@ -191,16 +119,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_no_difference 'Book.count' do
-      post books_path,
-           params: {
-             book: {
-               name: '',
-               author_name: 'Dan Brown',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '2010',
-               category_names: 'Mystery, Thriller'
-             }
-           }
+      post books_path, params: { book: book_params(name: '', category_names: 'Mystery, Thriller') }
       assert_redirected_to new_book_path
       assert_not_nil flash[:form_errors]
     end
@@ -208,16 +127,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
 
   test 'failing book create should not create associated model instances' do
     assert_no_difference ['Book.count', 'Author.count', 'Publisher.count', 'Category.count'] do
-      post books_path,
-           params: {
-             book: {
-               name: '',  # Empty name will make book create fail
-               author_name: 'Dan Brown',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '2010',
-               category_names: 'Mystery, Thriller'
-             }
-           }
+      post books_path, params: { book: book_params(name: '', category_names: 'Mystery, Thriller') }
       assert_redirected_to new_book_path
       assert_not_nil flash[:form_errors]
     end
@@ -228,16 +138,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_difference ['Category.count'], 1 do
-      post books_path,
-           params: {
-             book: {
-               name: 'Da Vinci Code',
-               author_name: 'Dan Brown',
-               publisher_name: 'Penguin Labs',
-               publishing_year: '2010',
-               category_names: 'Mystery'
-             }
-           }
+      post books_path, params: { book: book_params(category_names: 'Mystery') }
       assert_response :redirect
       follow_redirect!
       assert_response :success
@@ -248,13 +149,12 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
     assert_difference ['Book.count', 'Author.count', 'Publisher.count', 'Category.count'], 1 do
       post books_path,
            params: {
-             book: {
+             book: book_params(
                name: ' Da  Vinci     Code    ',
                author_name: '  Dan Brown   ',
                publisher_name: '    Penguin Labs    ',
-               publishing_year: '2010',
                category_names: '    Mystery        '
-             }
+             )
            }
       assert_response :redirect
       follow_redirect!
@@ -270,13 +170,10 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
       assert_no_difference 'Author.count' do
         post books_path,
              params: {
-               book: {
-                 name: 'Da Vinci Code',
+               book: book_params(
                  author_name: "   #{@author.name.gsub(/\s/, '    ')}   ",
-                 publisher_name: 'Penguin Labs',
-                 publishing_year: '2010',
                  category_names: 'Mystery'
-               }
+               )
              }
         assert_response :redirect
         follow_redirect!
@@ -293,13 +190,10 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
       assert_no_difference 'Publisher.count' do
         post books_path,
              params: {
-               book: {
-                 name: 'Da Vinci Code',
-                 author_name: 'Dan Brown',
+               book: book_params(
                  publisher_name: "   #{@publisher.name.gsub(/\s/, '    ')}   ",
-                 publishing_year: '2010',
                  category_names: 'Mystery'
-               }
+               )
              }
         assert_response :redirect
         follow_redirect!
@@ -316,13 +210,7 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
       assert_no_difference 'Category.count' do
         post books_path,
              params: {
-               book: {
-                 name: 'Da Vinci Code',
-                 author_name: 'Dan Brown',
-                 publisher_name: 'Penguin Labs',
-                 publishing_year: '2010',
-                 category_names: "   #{@category1.name.gsub(/\s/, '    ')}   "
-               }
+               book: book_params(category_names: "   #{@category1.name.gsub(/\s/, '    ')}   ")
              }
         assert_response :redirect
         follow_redirect!
@@ -333,20 +221,24 @@ class BooksCreateTest < ActionDispatch::IntegrationTest
 
   test 'cannot create book when logged out' do
     delete logout_path
-    post books_path,
-         params: {
-           book: {
-             name: 'Da Vinci Code',
-             author_name: 'Dan Brown',
-             publisher_name: 'Penguin Labs',
-             publishing_year: '2010',
-             category_names: 'Mystery, Crime'
-           }
-         }
+    post books_path, params: { book: book_params }
     assert_response :redirect
     follow_redirect!
     assert_response :success
     # Check for the actual warning message shown to unauthenticated users
     assert_match 'நூலக செயல்பாடுகளை அணுக நிர்வாகியாக', response.body
+  end
+
+  private
+
+  def book_params(overrides = {})
+    {
+      name: 'Da Vinci Code',
+      author_name: 'Dan Brown',
+      publisher_name: 'Penguin Labs',
+      publishing_year: '2010',
+      category_names: 'Mystery, Crime',
+      custom_number: 'BK4324324'
+    }.merge(overrides)
   end
 end
