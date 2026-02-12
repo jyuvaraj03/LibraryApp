@@ -4,7 +4,8 @@ class BooksController < ApplicationController
       Book
         .includes(:author, :publisher, :categories)
         .filter_by(book_search_params.slice(:availability))
-        .search(book_search_params[:search]),
+        .search(book_search_params[:search])
+        .order(id: :asc),
       items: book_search_params[:max_results] || Pagy::DEFAULT[:items]
     )
     respond_to do |format|
