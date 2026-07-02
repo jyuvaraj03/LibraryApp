@@ -19,9 +19,14 @@ class MembersController < ApplicationController
     authorize @member
   end
 
+  def edit
+    @member = Member.find(params[:id])
+    authorize @member
+  end
+
   def create
     authorize Member
-    @member = Member.new(member_params)
+    @member = Member.new(create_member_params)
     if @member.save
       flash[:snack_success] = I18n.t('successfully_created_member_name', name: @member.name)
       redirect_to members_path
@@ -31,12 +36,26 @@ class MembersController < ApplicationController
     end
   end
 
-  def member_params
+  def update
+    @member = Member.find(params[:id])
+    authorize @member
+    if @member.update(update_member_params)
+      flash[:snack_success] = I18n.t('successfully_updated_member_name', name: @member.name)
+      redirect_to members_path
+    else
+      flash.now[:form_errors] = @member.errors.full_messages
+      render :edit
+    end
+  end
+
+  private
+
+  def create_member_params
     mp = params
       .require(:member)
       .transform_values { |x| x.strip.gsub(/\s+/, ' ') if x.respond_to?('strip') }
       .reject { |_, v| v.blank? }
-      .permit(:name, :personal_number, :email, :phone, :tamil_name, :date_of_birth, :date_of_retirement, :custom_number, :auto_assign_custom_number)
+      .permit(:name, :personal_number, :email, :phone, :tamil_name, :section, :date_of_birth, :date_of_retirement, :custom_number, :auto_assign_custom_number)
 
     # If auto_assign_custom_number is present and true, remove custom_number so model can auto-assign
     auto_assign = mp.delete(:auto_assign_custom_number)
@@ -44,6 +63,17 @@ class MembersController < ApplicationController
       mp[:custom_number] = nil
     end
     mp
+  end
+
+  def update_member_params
+    params
+      .require(:member)
+      .transform_values do |x|
+        next x unless x.respond_to?('strip')
+
+        x.strip.gsub(/\s+/, ' ').presence
+      end
+      .permit(:name, :tamil_name, :personal_number, :email, :phone, :section, :date_of_birth, :date_of_retirement)
   end
 
   def member_search_params

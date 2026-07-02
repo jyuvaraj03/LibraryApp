@@ -7,6 +7,10 @@ class MemberPolicy < ApplicationPolicy
     user&.admin?
   end
 
+  def update?
+    user&.admin?
+  end
+
   def index?
     !!user
   end

@@ -40,7 +40,13 @@
       <tr>
         <td><%= member.custom_number %></td>
         <td><%= member.tamil_name %></td>
-        <td><%= member.name %></td>
+        <td>
+          <% if policy(member).edit? %>
+            <%= link_to member.name, edit_member_path(member), class: 'link-primary' %>
+          <% else %>
+            <%= member.name %>
+          <% end %>
+        </td>
         <td><%= member.personal_number %></td>
         <td><%= member.section %></td>
         <td><%= member.phone %></td>

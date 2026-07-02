@@ -3,7 +3,7 @@
 Rails.application.routes.draw do
   get 'sessions/new'
   resources :books, only: %i[create new index edit update]
-  resources :members, only: %i[create new index]
+  resources :members, only: %i[create new index edit update]
   resources :book_rentals, only: %i[create new index]
   resources :returns, only: %i[create new]
   resources :member_book_rentals, only: %i[index]
