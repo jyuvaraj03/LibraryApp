@@ -19,9 +19,15 @@ class BooksController < ApplicationController
     authorize @book
   end
 
+  def edit
+    @book = Book.find(params[:id])
+    authorize @book
+    set_book_form_fields
+  end
+
   def create
     authorize Book
-    @book = Book.create_with_associated_models(book_params)
+    @book = Book.create_with_associated_models(create_book_params)
     if @book.valid?
       flash[:snack_success] = I18n.t('successfully_created_book_name', name: @book.name)
       redirect_to books_path
@@ -31,14 +37,28 @@ class BooksController < ApplicationController
     end
   end
 
+  def update
+    @book = Book.find(params[:id])
+    authorize @book
+    @book.update_with_associated_models(update_book_params)
+    if @book.valid?
+      flash[:snack_success] = I18n.t('successfully_updated_book_name', name: @book.name)
+      redirect_to books_path
+    else
+      set_book_form_fields
+      flash.now[:form_errors] = @book.errors.full_messages
+      render :edit
+    end
+  end
+
   private
 
-  def book_params
+  def create_book_params
     bp = params
       .require(:book)
       .transform_values { |x| x.strip.gsub(/\s+/, ' ') if x.respond_to?('strip') }
       .reject { |_, v| v.blank? }
-      .permit(:custom_number, :name, :author_name, :publisher_name, :publishing_year, :category_names, :auto_assign_custom_number)
+      .permit(:custom_number, :name, :author_name, :publisher_name, :publishing_year, :category_names, :price, :auto_assign_custom_number)
 
     # If auto_assign_custom_number is present and true, remove custom_number so model can auto-assign
     auto_assign = bp.delete(:auto_assign_custom_number)
@@ -46,6 +66,19 @@ class BooksController < ApplicationController
       bp[:custom_number] = nil
     end
     bp
+  end
+
+  def update_book_params
+    params
+      .require(:book)
+      .transform_values { |x| x.strip.gsub(/\s+/, ' ') if x.respond_to?('strip') }
+      .permit(:name, :author_name, :publisher_name, :publishing_year, :category_names, :price)
+  end
+
+  def set_book_form_fields
+    @book.author_name = @book.author&.name
+    @book.publisher_name = @book.publisher&.name
+    @book.category_names = @book.categories.map(&:name).join(', ')
   end
 
   def book_search_params

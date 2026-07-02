@@ -7,6 +7,10 @@ class BookPolicy < ApplicationPolicy
     user&.admin?
   end
 
+  def update?
+    user&.admin?
+  end
+
   def index?
     true
   end

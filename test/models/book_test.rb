@@ -417,6 +417,52 @@ class BookTest < ActiveSupport::TestCase
     assert book.invalid?
   end
 
+  test 'can update with associated models and price' do
+    book = create_book_with_associated_models
+    assert book.valid?
+
+    assert_difference ['Author.count', 'Publisher.count', 'Category.count'], 1 do
+      book.update_with_associated_models(name: 'Updated Book',
+                                         author_name: 'Updated Author',
+                                         publisher_name: 'Updated Publisher',
+                                         publishing_year: 2020,
+                                         category_names: 'Updated Category',
+                                         price: 321.45)
+    end
+
+    assert book.valid?
+    assert_equal 'Updated Book', book.name
+    assert_equal 'Updated Author', book.author.name
+    assert_equal 'Updated Publisher', book.publisher.name
+    assert_equal 2020, book.publishing_year
+    assert_equal ['Updated Category'], book.categories.map(&:name)
+    assert_equal BigDecimal('321.45'), book.price
+  end
+
+  test 'failing associated model update should rollback changes' do
+    book = create_book_with_associated_models
+    original_name = book.name
+    original_author = book.author
+    original_publisher = book.publisher
+    original_category_ids = book.categories.ids.sort
+
+    assert_no_difference ['Author.count', 'Publisher.count', 'Category.count'] do
+      book.update_with_associated_models(name: nil,
+                                         author_name: 'Rollback Author',
+                                         publisher_name: 'Rollback Publisher',
+                                         publishing_year: 2020,
+                                         category_names: 'Rollback Category',
+                                         price: 321.45)
+    end
+
+    assert book.invalid?
+    book.reload
+    assert_equal original_name, book.name
+    assert_equal original_author, book.author
+    assert_equal original_publisher, book.publisher
+    assert_equal original_category_ids, book.categories.ids.sort
+  end
+
   private
 
   def create_book_with_associated_models(name: @book_name, author_name: @author_name,

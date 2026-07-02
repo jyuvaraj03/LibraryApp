@@ -1,0 +1,17 @@
+<%= form_with(model: book, local: true, class: "flex flex-col w-full bg-white shadow-md border rounded-md p-12") do |f| %>
+  <p class="text-4xl font-black mb-4"><%= title %></p>
+  <%= render 'shared/form_error_messages' %>
+  <% if show_custom_number %>
+    <%= form_field(f, :custom_number, :text_field, required: true, label_text: t('custom_number'), placeholder: t('book_custom_number_placeholder')) %>
+  <% end %>
+  <%= form_field(f, :name, :text_field, required: true, label_text: t('name_label'), placeholder: t('book_name_placeholder')) %>
+  <%= form_field(f, :author_name, :text_field, required: true, label_text: t('author_name_label'), placeholder: t('book_author_placeholder')) %>
+  <%= form_field(f, :publisher_name, :text_field, label_text: t('publisher_name_label'), placeholder: t('book_publisher_placeholder')) %>
+  <%= form_field(f, :publishing_year, :text_field, label_text: t('publishing_year_label'), placeholder: t('book_publishing_year_placeholder')) %>
+  <div class="flex flex-col mb-6">
+    <%= form_field(f, :category_names, :text_field, label_text: t('category_names_label'), placeholder: t('book_categories_placeholder'), div_class: 'flex flex-col') %>
+    <small class="p-1 text-gray-400"><%= t('comma_separated') %></small>
+  </div>
+  <%= form_field(f, :price, :number_field, label_text: t('price_label'), placeholder: t('book_price_placeholder')) %>
+  <%= f.submit submit_label, class: "btn-primary" %>
+<% end %>

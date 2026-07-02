@@ -55,7 +55,13 @@
             <span><%= book.custom_number %></span>
           </div>
         </td>
-        <td><%= book.name %></td>
+        <td>
+          <% if policy(book).edit? %>
+            <%= link_to book.name, edit_book_path(book), class: 'link-primary' %>
+          <% else %>
+            <%= book.name %>
+          <% end %>
+        </td>
         <td><%= book.author&.name %></td>
         <td><%= book.publisher&.name %></td>
         <td><%= book.publishing_year %></td>

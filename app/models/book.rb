@@ -23,7 +23,7 @@ class Book < ApplicationRecord
   has_many :categories, through: :book_categories
   has_many :book_rentals
 
-  attr_accessor :category_names
+  attr_accessor :category_names, :author_name, :publisher_name
 
   validates :custom_number, uniqueness: true
   # TODO: Uncomment after migrating production data and writing seeds
@@ -67,11 +67,15 @@ class Book < ApplicationRecord
   end
 
   def self.create_with_associated_models(hash = {})
-    self.upsert_or_create_with_associated_models(hash, :create)
+    upsert_or_create_with_associated_models(hash, :create)
   end
 
   def self.upsert_with_associated_models(hash = {})
-    self.upsert_or_create_with_associated_models(hash, :upsert)
+    upsert_or_create_with_associated_models(hash, :upsert)
+  end
+
+  def update_with_associated_models(hash = {})
+    self.class.update_with_associated_models(self, hash)
   end
 
   def available?
@@ -80,25 +84,48 @@ class Book < ApplicationRecord
 
   private
 
+  def self.update_with_associated_models(book, hash = {})
+    Book.transaction do
+      apply_associated_model_attributes(book, hash)
+      raise ActiveRecord::Rollback if book.invalid?
+    end
+    book
+  end
+
   def self.upsert_or_create_with_associated_models(hash, mode)
     book = nil
     Book.transaction do
-      author = Author.find_or_initialize_by(name: hash[:author_name])
-      publisher = Publisher.find_or_initialize_by(name: hash[:publisher_name])
-      categories = hash[:category_names]&.split(',')&.map do |category_name|
-        Category.find_or_initialize_by(name: category_name.strip)
-      end&.compact || Category.none
-
       book =
         if mode == :upsert
           Book.find_or_initialize_by(custom_number: hash[:custom_number])
         else
           Book.new(custom_number: hash[:custom_number])
         end
-      book.update(name: hash[:name], author: author, publisher: publisher,
-                  publishing_year: hash[:publishing_year], categories: categories)
+      apply_associated_model_attributes(book, hash)
       raise ActiveRecord::Rollback if book.invalid?
     end
     book
+  end
+
+  def self.apply_associated_model_attributes(book, hash)
+    book.update(name: hash[:name], author: find_associated_record(Author, hash[:author_name]),
+                publisher: find_associated_record(Publisher, hash[:publisher_name]),
+                publishing_year: hash[:publishing_year], categories: associated_categories(hash[:category_names]),
+                price: hash[:price])
+  end
+
+  def self.find_associated_record(klass, name)
+    return nil if name.blank?
+
+    klass.find_or_initialize_by(name: name)
+  end
+
+  def self.associated_categories(category_names)
+    return Category.none if category_names.blank?
+
+    category_names.split(',').filter_map do |category_name|
+      name = category_name.strip
+      Category.find_or_initialize_by(name: name) if name.present?
+    end
   end
 end
