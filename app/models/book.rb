@@ -22,6 +22,7 @@ class Book < ApplicationRecord
   has_many :book_categories
   has_many :categories, through: :book_categories
   has_many :book_rentals
+  has_many :current_book_rentals, -> { current }, class_name: 'BookRental'
 
   attr_accessor :category_names, :author_name, :publisher_name
 
@@ -79,6 +80,8 @@ class Book < ApplicationRecord
   end
 
   def available?
+    return current_book_rentals.empty? if association(:current_book_rentals).loaded?
+
     !BookRental.exists?(book_id: id, returned_on: nil)
   end
 

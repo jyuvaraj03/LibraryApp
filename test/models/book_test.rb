@@ -193,6 +193,21 @@ class BookTest < ActiveSupport::TestCase
     assert_not unreturned_book.available?
   end
 
+  test 'availability uses preloaded current book rentals' do
+    available_book_id = books(:five_point_someone).id
+    unavailable_book_id = books(:oliver_twist).id
+    books_by_id = Book.where(id: [available_book_id, unavailable_book_id])
+                      .includes(:current_book_rentals)
+                      .index_by(&:id)
+
+    assert_predicate books_by_id.fetch(available_book_id).association(:current_book_rentals), :loaded?
+    assert_predicate books_by_id.fetch(unavailable_book_id).association(:current_book_rentals), :loaded?
+    BookRental.expects(:exists?).never
+
+    assert books_by_id.fetch(available_book_id).available?
+    assert_not books_by_id.fetch(unavailable_book_id).available?
+  end
+
   test 'returned and then borrowed again book should be unavailable' do
     returned_and_borrowed_again_book = book_rentals(:returned_and_borrowed_again).book
     assert returned_and_borrowed_again_book.valid?

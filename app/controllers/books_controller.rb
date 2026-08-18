@@ -2,7 +2,7 @@ class BooksController < ApplicationController
   def index
     @pagy, @books = pagy(
       Book
-        .includes(:author, :publisher, :categories)
+        .includes(:author, :publisher, :categories, :current_book_rentals)
         .filter_by(book_search_params.slice(:availability))
         .search(book_search_params[:search])
         .order(id: :asc),
