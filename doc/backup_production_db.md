@@ -10,15 +10,19 @@ watch -n 30 curl https://muthamizh-mandram.fly.dev/
 ```bash
 # In another console, from inside the root of this folder
 fly ssh console
-echo $DATABASE_URL
+```
+```bash
+# Inside the console, run the following command to get the DATABASE_URL
+echo $DATABASE_URL | sed 's/muthamizh-mandram-db.flycast:5432/localhost:15432/'
 ```
 
 The database URL should look something like this:
 ```
-postgres://user:password@muthamizh-mandram-db.flycast:5432/muthamizh_mandram?sslmode=disable
+postgres://user:password@localhost:15432/muthamizh_mandram?sslmode=disable
 ```
 3. Use pg_dump to dump the database contents from the proxied production postgres connection
 ```bash
 # Make sure to switch the muthamizh-mandram-db.flycast:5432 from above to localhost:15432
-pg_dump postgres://user:password@localhost:15432/muthamizh_mandram?sslmode=disable -f db_backup_$(date +%s).sql
+DATABASE_URL="postgres://user:password@localhost:15432/muthamizh_mandram?sslmode=disable"
+pg_dump $DATABASE_URL -f db_backup_$(date +%s).sql
 ```
