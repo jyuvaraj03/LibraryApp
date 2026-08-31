@@ -1,5 +1,6 @@
 ta:
   members: "உறுப்பினர்கள்"
+  senior_member: "மூத்த உறுப்பினர்"
   new_member: "புதிய உறுப்பினர்"
   search_by_name_id_or_personal_number: "உறுப்பினர் எண், பெயர் அல்லது நிரந்தர எண் மூலம் தேடவும்"
   search: "தேடு"

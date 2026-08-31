@@ -41,11 +41,16 @@
         <td><%= member.custom_number %></td>
         <td><%= member.tamil_name %></td>
         <td>
-          <% if policy(member).edit? %>
-            <%= link_to member.name, edit_member_path(member), class: 'link-primary' %>
-          <% else %>
-            <%= member.name %>
-          <% end %>
+          <div class="flex items-center gap-2">
+            <% if policy(member).edit? %>
+              <%= link_to member.name, edit_member_path(member), class: 'link-primary' %>
+            <% else %>
+              <%= member.name %>
+            <% end %>
+            <% if member.senior? %>
+              <span class="rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800"><%= t('senior_member') %></span>
+            <% end %>
+          </div>
         </td>
         <td><%= member.personal_number %></td>
         <td><%= member.section %></td>

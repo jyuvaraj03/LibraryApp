@@ -156,6 +156,17 @@ class MembersControllerTest < ActionDispatch::IntegrationTest
     assert_select 'td', text: member.name
   end
 
+  test 'member list marks members older than 60 as senior' do
+    member = members(:johnny)
+    member.update!(date_of_birth: 61.years.ago.to_date)
+    log_in_as(staffs(:admino))
+
+    get members_path
+
+    assert_response :success
+    assert_select 'span', text: I18n.t('senior_member'), count: 1
+  end
+
   test 'should throw flash when creating a second member with same mobile number' do
     log_in_as staffs(:admino)
     assert_difference 'Member.count' do
