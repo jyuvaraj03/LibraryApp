@@ -1,5 +1,6 @@
 en:
   members: "Members"
+  senior_member: "Senior"
   new_member: "New Member"
   search_by_name_id_or_personal_number: "Search by name, ID or personal number"
   search: "Search"

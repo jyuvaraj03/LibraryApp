@@ -122,4 +122,23 @@ class MemberTest < ActiveSupport::TestCase
     Member.expects(:all).once
     Member.filter_by_can_rent('false')
   end
+
+  test 'senior? is true only when the member is older than 60' do
+    travel_to Date.new(2026, 8, 31) do
+      @member.date_of_birth = Date.new(1966, 8, 30)
+      assert_predicate @member, :senior?
+
+      @member.date_of_birth = Date.new(1966, 8, 31)
+      assert_not_predicate @member, :senior?
+
+      @member.date_of_birth = Date.new(1966, 9, 1)
+      assert_not_predicate @member, :senior?
+    end
+  end
+
+  test 'senior? is false when the date of birth is missing' do
+    @member.date_of_birth = nil
+
+    assert_not_predicate @member, :senior?
+  end
 end

@@ -48,4 +48,8 @@ class Member < ApplicationRecord
     end
   end
 
+  def senior?
+    date_of_birth.present? && date_of_birth < 60.years.ago.to_date
+  end
+
 end
